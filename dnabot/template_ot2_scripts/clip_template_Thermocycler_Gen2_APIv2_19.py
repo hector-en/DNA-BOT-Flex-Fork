@@ -33,12 +33,13 @@ __LABWARES={
     "96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"}, 
     "96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"},
     "24_tuberack_1500ul": {"id": "opentrons_24_tuberack_nest_1.5ml_snapcap"},
-    #"clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
-    #"mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
-    #"clip_source_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
-    "clip_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
-    "mix_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
+    #comment in out equipment below for simulate or run
     "clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+    "clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+    "mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+    #"clip_source_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
+    #"clip_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
+    #"mix_plate": {"id": "4ti0960rig_96_wellplate_200ul"},  
     "agar_plate_step_4": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
     "12_reservoir_21000ul": {"id": "4ti0131_12_reservoir_21000ul"}, 
     "96_deepwellplate_2ml": {"id": "4ti0136_96_wellplate_2200ul"}}
