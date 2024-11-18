@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python > 3.6, <=3.9
+  - python > 3.6, <=3.10
   - async-timeout==3.0.1
   - attrs==19.3.0
   - chardet==3.0.4
