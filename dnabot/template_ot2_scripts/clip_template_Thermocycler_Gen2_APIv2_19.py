@@ -117,7 +117,6 @@ def run(protocol: protocol_api.ProtocolContext):
     WATER_WELL = 'A2'
     MASTER_MIX_VOLUME = 20
 
-    # Mix settings
     # Old Mix settings
     LINKER_MIX_SETTINGS = (2, 3)
     PART_MIX_SETTINGS = (2, 5)
@@ -127,7 +126,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     def mix_linkers_function(Mix_linkers_bool, clips_dict, pipette_name, source_plates):
         pipette = pipette_name
-        #pipetting speeds - expressed as multiple of default
         #pipetting speeds - default rates in ul /s
         pipette.flow_rate.aspirate = 6
         pipette.flow_rate.dispense = 6
@@ -138,7 +136,6 @@ def run(protocol: protocol_api.ProtocolContext):
         slow = 0.5
         vslow = 0.2
         #Linker reagent volume - specify minimum volume in linker wells
-        linker_vol=20
         #linker_volume=20
         #set maximum volume for mixing calculations as 40 as P20 pipette being used
         #maximum linker mix is set as linker_vol/2
@@ -217,7 +214,6 @@ def run(protocol: protocol_api.ProtocolContext):
         slow = 0.5
         vslow = 0.2
         #Linker reagent volume - specify minimum volume in linker wells
-        linker_vol=20
         #linker_volume=20
         #set maximum volume for mixing calculations as 40 as P20 pipette being used
         #maximum linker mix is set as linker_vol/2
