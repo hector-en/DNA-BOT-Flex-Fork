@@ -203,7 +203,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     def mix_parts_function(Mix_parts_bool, clips_dict, pipette_name, source_plates):
         pipette = pipette_name
-        #pipetting speeds - expressed as multiple of default
+        
         pipette.flow_rate.aspirate = 6
         pipette.flow_rate.dispense = 6
         pipette.flow_rate.blow_out = 15

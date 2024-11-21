@@ -22,7 +22,7 @@ from pathlib import Path
 abs_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, abs_path)
 
-import dnabot_gui as gui
+import dnabot_gui2_0 as gui
 import mplates
 import slots
 

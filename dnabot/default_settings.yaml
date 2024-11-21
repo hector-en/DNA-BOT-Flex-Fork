@@ -90,7 +90,10 @@ parameters:
   # 1 for yes, 0 for no
   clip_keep_thermo_lid_closed:
     value: 0
-
+  premix_linkers:
+    value: 'Test_linkers'
+  premix_parts:
+    value: 'Test_parts'
   # Purification step #####################################
   # Magnetic module height (mm) - purification step
   purif_magdeck_height: 
