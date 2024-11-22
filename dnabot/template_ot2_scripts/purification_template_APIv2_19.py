@@ -3,7 +3,7 @@ from opentrons import protocol_api
 # Rename to 'purification_template' and paste into 'template_ot2_scripts' folder in DNA-BOT to use
 
 metadata = {
-     'apiLevel': '2.8',
+     'apiLevel': '2.19',
      'protocolName': 'DNABOT Step 2: Purification',
      'description': 'Implements magbead purification reactions for BASIC assembly using an opentrons OT-2'}
 

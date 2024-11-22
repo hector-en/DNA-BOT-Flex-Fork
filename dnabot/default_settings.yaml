@@ -12,7 +12,7 @@ labwares:
   # Modules ###############################################
   # Opentrons magnetic module (step: purification)
   mag_deck:
-    id: magdeck
+    id: magneticModuleV1
     # id: magnetic module gen2  # BRS
 
   # Tip racks #############################################
@@ -89,11 +89,17 @@ parameters:
   # Keep the thermocycler lid closed at 4°C at the end of execution?
   # 1 for yes, 0 for no
   clip_keep_thermo_lid_closed:
-    value: 0
+    value: 'No'
   premix_linkers:
-    value: 'Test_linkers'
+    value: 'Yes'
   premix_parts:
-    value: 'Test_parts'
+    value: 'Yes'
+  linkers_volume:
+    value: 20
+  parts_volume:
+    value: 20
+  thermo_temp:
+    value: 4
   # Purification step #####################################
   # Magnetic module height (mm) - purification step
   purif_magdeck_height: 
