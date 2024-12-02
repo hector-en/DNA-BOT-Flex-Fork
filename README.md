@@ -64,7 +64,7 @@ Ensure you have the following installed:
 
 2. **Set Up a Conda Environment**:
    ```bash
-   conda create --name dnabot-flex python=3.7
+   conda create --name dnabot-flex python=3.10
    conda activate dnabot-flex
    pip install -r requirements.txt
    ```
