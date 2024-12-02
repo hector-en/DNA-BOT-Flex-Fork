@@ -4,7 +4,7 @@ import opentrons.simulate
 # Metadata
 metadata = {
     'apiLevel': '2.15',
-    'protocolName': 'Flex-Compatible Transformation Protocol',
+    'protocolName': 'Flex-Compatible Protocol',
     'description': 'Simulate a Clip Reaction on OT-2 or Flex'
 }
 

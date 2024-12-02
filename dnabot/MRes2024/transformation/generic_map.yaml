@@ -1,0 +1,32 @@
+labware:
+  opentrons_96_tiprack_300ul: opentrons_flex_96_tiprack_300ul
+  nest_96_wellplate_100ul_pcr_full_skirt: flex_96_wellplate_100ul_pcr_full_skirt
+
+pipettes:
+  p300_single: p300_single_gen3
+  p1000_single: p1000_single_gen3
+
+modules:
+  thermocycler_module_v1: thermocycler_module_gen2
+  magneticModuleV1: magneticModuleV2
+
+commands:
+  set_block_temperature:
+    from: "set_block_temperature\\((\\d+), hold_time_seconds=(\\d+)\\)"
+    to: "set_block_temperature(\\1, hold_time_minutes=\\2 / 60)"
+  liquid_detection:
+    insert_after: "# Transformation Workflow"
+    code: |
+      def liquid_detection(pipette, well):
+          try:
+              pipette.liquid_detect(well.bottom(1))
+              return True
+          except Exception as e:
+              print(f"Liquid detection failed: {e}")
+              return False
+      if not liquid_detection(pipette, plate.wells_by_name()['A1']):
+          raise RuntimeError('Liquid detection failed for well A1')
+
+metadata:
+  apiLevel: "2.15"
+  protocolName: "Flex-Compatible Protocol"
