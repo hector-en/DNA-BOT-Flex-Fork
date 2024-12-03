@@ -1,6 +1,6 @@
 metadata:
   protocolName: "Simulate a Clip Reaction on OT-2 or Flex"
-  description: "Simulate a Clip Reaction on OT-2 or Flex"
+  description: "Implements linker ligation reactions using Opentrons Flex with thermocycler module."
 
 requirements:
   robotType: "Flex"
@@ -8,28 +8,52 @@ requirements:
 
 deckSetup:
   tipracks:
-    - {"name": "opentrons_flex_96_tiprack_50ul", "slot": "1", "variable": "tiprack_50"}
+    - name: "opentrons_flex_96_tiprack_50ul"
+      slot: "1"
+      variable: "tiprack_50"
   plates:
-    - {"name": "nest_96_wellplate_100ul_pcr_full_skirt", "slot": "2", "variable": "plate_96"}
+    - name: "nest_96_wellplate_100ul_pcr_full_skirt"
+      slot: "2"
+      variable: "clip_plate"
   trash:
-    {"name": "opentrons_1_trash_1100ml_fixed", 
-    "slot": {
-      "flex": "A3", 
-      "ot2": "12"
-      }, 
-      "variable": "trash", 
-      "dropTipLocation": "A1"
-      }
+    name: "opentrons_1_trash_1100ml_fixed"
+    slot:
+      flex: "A3"
+      ot2: "12"
+    variable: "trash"
+    dropTipLocation: "A1"
 
 variables:
-  "tiprack_20ul": "tiprack_50"
-  "plate_96": "plate_96"
-  "trash": "trash"
+  PIPETTE_TYPE: "FLEX_PIPETTE_TYPE"
+  tiprack_type: "flex_tiprack_type"
+  destination_plate: "flex_destination_plate"
+  destination_wells: "flex_destination_wells"
+  source_plates: "flex_source_plates"
+  MASTER_MIX_WELL: "flex_master_mix_well"
+  WATER_WELL: "flex_water_well"
+  TUBE_RACK_TYPE: "flex_tube_rack_type"
+
+variable_ids:
+# OT-2 to Flex Variable Mapping (Bidirectional)
+  "p20_single": "flex_1channel_50"
+  "p300_multi": "flex_8channel_1000"
+  "mag_deck": "flex_magnetic_block"
+  "96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
+  "96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "clip_plate": "flex_clip_plate"
+  "mix_plate": "flex_mix_plate"
+  "agar_plate": "flex_agar_plate"
+  "24_tuberack_1500ul": "opentrons_24_tuberack_nest_1.5ml_snapcap"
+  "12_reservoir_21000ul": "flex_12_reservoir_15ml"
+  "96_deepwellplate_2ml": "flex_deepwell_plate"
 
 labware:
+  # OT-2 to Flex Labware Mapping (Bidirectional)
   # Tip racks
-  "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
   "opentrons_96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
+  "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "opentrons_flex_96_tiprack_1000ul": "opentrons_96_tiprack_300ul"
+  "opentrons_24_tuberack_nest_1.5ml_snapcap": "opentrons_24_tuberack_nest_1.5ml_snapcap"
   # Well plates
   "nest_96_wellplate_100ul_pcr_full_skirt": "nest_96_wellplate_100ul_pcr_full_skirt"
   "corning_96_wellplate_360ul_flat": "corning_96_wellplate_360ul_flat"
@@ -38,25 +62,29 @@ labware:
   "usascientific_12_reservoir_22ml": "nest_12_reservoir_15ml"
   "agilent_1_reservoir_290ml": "axygen_1_reservoir_90ml"
 
-
 pipettes:
-  # OT-2 to Flex Pipette Mapping
+  # OT-2 to Flex Pipette Mapping (Bidirectional)
   "p300_single_gen2": "flex_1channel_1000"
+  "flex_1channel_1000": "p300_single_gen2"
   "p1000_single_gen2": "flex_1channel_1000"
+  "flex_1channel_1000": "p1000_single_gen2"
   "p20_single_gen2": "flex_1channel_50"
+  "flex_1channel_50": "p20_single_gen2"
   "p300_multi_gen2": "flex_8channel_1000"
+  "flex_8channel_1000": "p300_multi_gen2"
   "p20_multi_gen2": "flex_8channel_50"
 
+
 modules:
-  # OT-2 to Flex Modules
+  # OT-2 to Flex Modules (Bidirectional)
   "temperature module gen2": "temperature module gen2"
   "thermocycler module gen2": "thermocycler module gen2"
   "heaterShakerModuleV1": "heaterShakerModuleV1"
-  # Magnetic Module requires rework
+  # Magnetic Module requires rework (Bidirectional)
   "magnetic module gen2": "magnetic block"
+  "magneticModuleV1": "flex magnetic block"
 
 commands:
-  # Update command syntax as needed
   mix:
     from: "pipette.mix"
     to: "pipette.mix"
@@ -71,9 +99,8 @@ commands:
     to: "pipette.pick_up_tip"
   drop_tip:
     from: "pipette.drop_tip"
-    to: "pipette.drop_tip"
+    to: "pipette.drop_tip(trash['A1'])"
   move_labware:
     from: "protocol.move_labware"
     to: "protocol.move_labware"
     insert_after: "protocol.load_instrument"
-    code: "protocol.comment('Gripper required for labware transfer')"
