@@ -1,0 +1,79 @@
+metadata:
+  protocolName: "Simulate a Clip Reaction on OT-2 or Flex"
+  description: "Simulate a Clip Reaction on OT-2 or Flex"
+
+requirements:
+  robotType: "Flex"
+  apiLevel: "2.19"
+
+deckSetup:
+  tipracks:
+    - {"name": "opentrons_flex_96_tiprack_50ul", "slot": "1", "variable": "tiprack_50"}
+  plates:
+    - {"name": "nest_96_wellplate_100ul_pcr_full_skirt", "slot": "2", "variable": "plate_96"}
+  trash:
+    {"name": "opentrons_1_trash_1100ml_fixed", 
+    "slot": {
+      "flex": "A3", 
+      "ot2": "12"
+      }, 
+      "variable": "trash", 
+      "dropTipLocation": "A1"
+      }
+
+variables:
+  "tiprack_20ul": "tiprack_50"
+  "plate_96": "plate_96"
+  "trash": "trash"
+
+labware:
+  # Tip racks
+  "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "opentrons_96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
+  # Well plates
+  "nest_96_wellplate_100ul_pcr_full_skirt": "nest_96_wellplate_100ul_pcr_full_skirt"
+  "corning_96_wellplate_360ul_flat": "corning_96_wellplate_360ul_flat"
+  "biorad_96_wellplate_200ul_pcr": "armadillo_96_wellplate_200ul_pcr_full_skirt"
+  # Reservoirs
+  "usascientific_12_reservoir_22ml": "nest_12_reservoir_15ml"
+  "agilent_1_reservoir_290ml": "axygen_1_reservoir_90ml"
+
+
+pipettes:
+  # OT-2 to Flex Pipette Mapping
+  "p300_single_gen2": "flex_1channel_1000"
+  "p1000_single_gen2": "flex_1channel_1000"
+  "p20_single_gen2": "flex_1channel_50"
+  "p300_multi_gen2": "flex_8channel_1000"
+  "p20_multi_gen2": "flex_8channel_50"
+
+modules:
+  # OT-2 to Flex Modules
+  "temperature module gen2": "temperature module gen2"
+  "thermocycler module gen2": "thermocycler module gen2"
+  "heaterShakerModuleV1": "heaterShakerModuleV1"
+  # Magnetic Module requires rework
+  "magnetic module gen2": "magnetic block"
+
+commands:
+  # Update command syntax as needed
+  mix:
+    from: "pipette.mix"
+    to: "pipette.mix"
+  aspirate:
+    from: "pipette.aspirate"
+    to: "pipette.aspirate"
+  dispense:
+    from: "pipette.dispense"
+    to: "pipette.dispense"
+  pick_up_tip:
+    from: "pipette.pick_up_tip"
+    to: "pipette.pick_up_tip"
+  drop_tip:
+    from: "pipette.drop_tip"
+    to: "pipette.drop_tip"
+  move_labware:
+    from: "protocol.move_labware"
+    to: "protocol.move_labware"
+    insert_after: "protocol.load_instrument"
+    code: "protocol.comment('Gripper required for labware transfer')"
