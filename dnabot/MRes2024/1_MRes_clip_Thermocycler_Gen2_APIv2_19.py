@@ -66,15 +66,20 @@ requirements = {"robotType": "Flex", "apiLevel": "2.19"}
 
 
 clips_dict={"prefixes_wells": ["C1", "A1", "E1", "B2", "D2", "B2"], 
+            #"prefixes_plates": ["2", "2", "2", "2", "2", "2"], 
             "prefixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "suffixes_wells": ["B1", "A2", "C2", "E2", "D1", "D1"], 
+            #"suffixes_plates": ["2", "2", "2", "2", "2", "2"], 
             "suffixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_wells": ["A3", "B3", "C3", "D3", "E3", "D3"], 
+            #"parts_plates": ["2", "2", "2", "2", "2", "2"], 
             "parts_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_vols": [1, 1, 1, 1, 1, 1], 
             "water_vols": [7.0, 7.0, 7.0, 7.0, 7.0, 7.0]}
 __LABWARES={"p20_single": {"id": "flex_1channel_50"}, 
             "p300_multi": {"id": "flex_8channel_50"}, 
+            #"p20_single": {"id": "p20_single_gen2"}, 
+            #"p300_multi": {"id": "p300_multi_gen2"}, 
             "mag_deck": {"id": "magneticModuleV1"}, 
             "96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"}, 
             "96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"}, 
