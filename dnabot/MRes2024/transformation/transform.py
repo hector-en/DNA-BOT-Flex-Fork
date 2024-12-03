@@ -75,10 +75,7 @@ class GenericTransformer:
 
         # Extract the original description
         current_description_match = re.search(r"'description':\s*'(.*?)'", script)
-        if current_description_match:
-            current_description = current_description_match.group(1)
-        else:
-            current_description = metadata_map.get("description", "Simulate a Clip Reaction")
+        current_description = current_description_match.group(1) if current_description_match else metadata_map.get("description", "Simulate a Clip Reaction")
 
         if reverse:  # Flex to OT-2
             # Extract apiLevel from requirements or default to "2.15"
@@ -90,11 +87,10 @@ class GenericTransformer:
 
             # Replace metadata with OT-2 specific structure
             script = re.sub(r"'protocolName': '.*?'", "'protocolName': 'OT-2 Protocol'", script)
-            # Update description to refer to OT-2
             updated_description = current_description.replace("Flex", "OT-2")
             script = re.sub(r"'description': '.*?'", f"'description': '{updated_description}',", script)
 
-            # Add apiLevel below metadata, properly formatted
+            # Add apiLevel back to metadata
             script = re.sub(
                 r"(metadata = {.*?)(})",  # Match metadata content and closing brace
                 r"\1    'apiLevel': '" + api_level + r"'\2",  # Insert apiLevel before closing brace
@@ -103,17 +99,21 @@ class GenericTransformer:
             )
         else:  # OT-2 to Flex
             # Extract apiLevel from the metadata section
-            current_api_level = re.search(r"'apiLevel':\s*'[0-9.]+'", script)
+            current_api_level = re.search(r"apiLevel:\s*'[0-9.]+'", script)
             api_level = current_api_level.group(0).split(':')[1].strip(' "').strip() if current_api_level else requirements_map.get("apiLevel", "2.19")
+                        # Remove apiLevel from metadata
+            script = re.sub(
+                r"'apiLevel':\s*'[^']*'(,?\s*)?",  # Match 'apiLevel': '<value>' optionally followed by a comma and whitespace
+                "",
+                script
+            )            
 
-            # Remove apiLevel from metadata
-            script = re.sub(r"\s*'apiLevel': '.*?',\n?", "", script)
 
             # Update metadata and add requirements dynamically
             script = re.sub(r"'protocolName': '.*?'", "'protocolName': '" + metadata_map["protocolName"] + "'", script)
-            # Update description to refer to Flex
             updated_description = current_description.replace("OT-2", "Flex")
             script = re.sub(r"'description': '.*?'", f"'description': '{updated_description}'", script)
+
 
             # Add requirements with extracted apiLevel
             requirements_with_api_level = requirements_map.copy()
