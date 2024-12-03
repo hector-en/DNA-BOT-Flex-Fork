@@ -243,7 +243,6 @@ if __name__ == "__main__":
     direction = sys.argv[3]
 
     transformer = GenericTransformer("generic_map.yaml")
-
     if direction == "-of":
         transformer.transform(input_script, output_script, reverse=False)
     elif direction == "-fo":

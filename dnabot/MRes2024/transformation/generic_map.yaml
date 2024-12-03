@@ -1,6 +1,6 @@
 metadata:
   protocolName: "Simulate a Clip Reaction on OT-2 or Flex"
-  description: "Implements linker ligation reactions using Opentrons Flex with thermocycler module."
+  description: "Simulate a Clip Reaction on OT-2 or Flex"
 
 requirements:
   robotType: "Flex"
@@ -54,6 +54,7 @@ labware:
   "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
   "opentrons_flex_96_tiprack_1000ul": "opentrons_96_tiprack_300ul"
   "opentrons_24_tuberack_nest_1.5ml_snapcap": "opentrons_24_tuberack_nest_1.5ml_snapcap"
+
   # Well plates
   "nest_96_wellplate_100ul_pcr_full_skirt": "nest_96_wellplate_100ul_pcr_full_skirt"
   "corning_96_wellplate_360ul_flat": "corning_96_wellplate_360ul_flat"
@@ -85,6 +86,7 @@ modules:
   "magneticModuleV1": "flex magnetic block"
 
 commands:
+  # Update command syntax as needed
   mix:
     from: "pipette.mix"
     to: "pipette.mix"
@@ -104,3 +106,5 @@ commands:
     from: "protocol.move_labware"
     to: "protocol.move_labware"
     insert_after: "protocol.load_instrument"
+    code: "protocol.comment('Gripper required for labware transfer')"
+
