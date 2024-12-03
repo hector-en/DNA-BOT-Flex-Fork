@@ -6,10 +6,11 @@ import numpy as np
 
 #metadata
 metadata = {
-     'apiLevel': '2.19',
      'protocolName': 'DNABOT Step 1: Clip Reaction with thermocycler',
-     'description': 'Implements linker ligation reactions using an opentrons OT-2, including the thermocycler module gen2.'
+     'description': 'Implements linker ligation reactions using an opentrons Flex, including the thermocycler module gen2.'
 }
+
+requirements = {"robotType": "Flex", "apiLevel": "2.19"}
 # linkers_volume=20
 # parts_volume=20
 
@@ -65,15 +66,15 @@ metadata = {
 
 
 clips_dict={"prefixes_wells": ["C1", "A1", "E1", "B2", "D2", "B2"], 
-            "prefixes_plates": ["2", "2", "2", "2", "2", "2"], 
+            "prefixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "suffixes_wells": ["B1", "A2", "C2", "E2", "D1", "D1"], 
-            "suffixes_plates": ["2", "2", "2", "2", "2", "2"], 
+            "suffixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_wells": ["A3", "B3", "C3", "D3", "E3", "D3"], 
-            "parts_plates": ["2", "2", "2", "2", "2", "2"], 
+            "parts_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_vols": [1, 1, 1, 1, 1, 1], 
             "water_vols": [7.0, 7.0, 7.0, 7.0, 7.0, 7.0]}
-__LABWARES={"p20_single": {"id": "p20_single_gen2"}, 
-            "p300_multi": {"id": "p300_multi_gen2"}, 
+__LABWARES={"p20_single": {"id": "flex_1channel_50"}, 
+            "p300_multi": {"id": "flex_8channel_50"}, 
             "mag_deck": {"id": "magneticModuleV1"}, 
             "96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"}, 
             "96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"}, 
@@ -100,6 +101,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ### Constants - these have been moved out of the def clip() for clarity
 
+    #flex need trash bin
+    trash = protocol.load_trash_bin("A3")
     #Tiprack
     tiprack_type=__LABWARES['96_tiprack_20ul']['id']
     INITIAL_TIP = 'A1'
@@ -110,7 +113,7 @@ def run(protocol: protocol_api.ProtocolContext):
     PIPETTE_MOUNT = 'right'
         ### Load Pipette
         # checks if it's a P20 Single pipette
-    if PIPETTE_TYPE != 'p20_single_gen2':
+    if PIPETTE_TYPE != 'flex_1channel_50':
         print('Define labware must be changed to use', PIPETTE_TYPE)
         exit()
     #thermocycler module gen2 - turn off lid and cool plate to reduce evaporation
