@@ -68,32 +68,76 @@ class GenericTransformer:
 
     def apply_metadata_and_requirements(self, script, reverse=False):
         """
-        Update metadata and requirements.
+        Update metadata and requirements dynamically for Flex to OT-2 and OT-2 to Flex transformations.
         """
         metadata_map = self.map["metadata"]
-        if reverse:
-            script = re.sub(r"'protocolName': '.*?'", "'protocolName': 'OT-2 Protocol'", script)
-            script = re.sub(r"'description': '.*?'", "'description': 'Simulate a Clip Reaction on OT-2'", script)
-            script = re.sub(r"requirements = {.*?}", "", script, flags=re.DOTALL)
+        requirements_map = self.map["requirements"]
+
+        # Extract the original description
+        current_description_match = re.search(r"'description':\s*'(.*?)'", script)
+        if current_description_match:
+            current_description = current_description_match.group(1)
         else:
-            script = re.sub(r"'protocolName': '.*?'", "'protocolName': '" + metadata_map["protocolName"] + "'", script)
-            script = re.sub(r"'description': '.*?'", "'description': '" + metadata_map["description"] + "'", script)
+            current_description = metadata_map.get("description", "Simulate a Clip Reaction")
+
+        if reverse:  # Flex to OT-2
+            # Extract apiLevel from requirements or default to "2.15"
+            current_api_level = re.search(r'"apiLevel":\s*"[0-9.]+"', script)
+            api_level = current_api_level.group(0).split(':')[1].strip(' "').strip() if current_api_level else "2.15"
+
+            # Remove requirements
+            script = re.sub(r"requirements = {.*?}\n", "", script, flags=re.DOTALL)
+
+            # Replace metadata with OT-2 specific structure
+            script = re.sub(r"'protocolName': '.*?'", "'protocolName': 'OT-2 Protocol'", script)
+            # Update description to refer to OT-2
+            updated_description = current_description.replace("Flex", "OT-2")
+            script = re.sub(r"'description': '.*?'", f"'description': '{updated_description}',", script)
+
+            # Add apiLevel below metadata, properly formatted
             script = re.sub(
-                r"(metadata = {.*?})",
-                r"\1\nrequirements = " + json.dumps(self.map["requirements"], indent=4),
+                r"(metadata = {.*?)(})",  # Match metadata content and closing brace
+                r"\1    'apiLevel': '" + api_level + r"'\2",  # Insert apiLevel before closing brace
                 script,
                 flags=re.DOTALL
             )
+        else:  # OT-2 to Flex
+            # Extract apiLevel from the metadata section
+            current_api_level = re.search(r"'apiLevel':\s*'[0-9.]+'", script)
+            api_level = current_api_level.group(0).split(':')[1].strip(' "').strip() if current_api_level else requirements_map.get("apiLevel", "2.19")
+
+            # Remove apiLevel from metadata
+            script = re.sub(r"\s*'apiLevel': '.*?',\n?", "", script)
+
+            # Update metadata and add requirements dynamically
+            script = re.sub(r"'protocolName': '.*?'", "'protocolName': '" + metadata_map["protocolName"] + "'", script)
+            # Update description to refer to Flex
+            updated_description = current_description.replace("OT-2", "Flex")
+            script = re.sub(r"'description': '.*?'", f"'description': '{updated_description}'", script)
+
+            # Add requirements with extracted apiLevel
+            requirements_with_api_level = requirements_map.copy()
+            requirements_with_api_level["apiLevel"] = api_level
+            script = re.sub(
+                r"(metadata = {.*?})",
+                r"\1\nrequirements = " + json.dumps(requirements_with_api_level, indent=4),
+                script,
+                flags=re.DOTALL
+            )
+
         return script
 
 
     def apply_labware_changes(self, script, reverse=False):
         """
         Update labware definitions dynamically using mappings and configuration from the YAML file.
+        Handles trash setup and drop_tip behavior dynamically.
         """
         labware_map = self.map["labware"]
         variable_map = self.map.get("variables", {})
         deck_setup = self.map.get("deckSetup", {})
+        trash_config = deck_setup.get("trash", {})
+        trash_variable = trash_config.get("variable", "trash")
         map_to_use = labware_map if not reverse else {v: k for k, v in labware_map.items()}
 
         # Replace old labware with new labware based on mappings
@@ -104,30 +148,23 @@ class GenericTransformer:
         for old_var, new_var in variable_map.items():
             script = re.sub(rf"\b{old_var}\b", new_var, script)
 
-        # Handle deck setup dynamically
-        if not reverse:
-            # Add trash setup
-            trash = deck_setup.get("trash", {})
-            trash_name = trash.get("name")
-            trash_slot = trash.get("slot")
-            trash_variable = trash.get("variable", variable_map.get("trash", "trash"))
+        # Handle reverse (Flex to OT-2) transformations
+        if reverse:
+            # Remove trash setup
+            trash_pattern = rf"{trash_variable} = protocol\.load_labware\('.*?', '.*?'\)"
+            script = re.sub(trash_pattern, "", script)
+
+            # Replace pipette.drop_tip(trash['A1']) with pipette.drop_tip()
+            drop_tip_pattern = rf"pipette\.drop_tip\({trash_variable}\['.*?'\]\)"
+            script = re.sub(drop_tip_pattern, "pipette.drop_tip()", script)
+        else:
+            # Handle Flex transformations (add trash setup if missing)
+            trash_name = trash_config.get("name")
+            trash_slot = trash_config.get("slot", {}).get("flex")
             if trash_name and trash_slot:
                 trash_setup = f"{trash_variable} = protocol.load_labware('{trash_name}', '{trash_slot}')"
                 if trash_name not in script:
                     script = re.sub(r"(plate_96 = .+)", r"\1\n    " + trash_setup, script)
-
-            # Add tip racks and plates dynamically
-            for tiprack in deck_setup.get("tipracks", []):
-                tiprack_variable = variable_map.get(tiprack.get("variable"), tiprack["variable"])
-                tiprack_setup = f"{tiprack_variable} = protocol.load_labware('{tiprack['name']}', '{tiprack['slot']}')"
-                if tiprack["name"] not in script:
-                    script += "\n    " + tiprack_setup
-
-            for plate in deck_setup.get("plates", []):
-                plate_variable = variable_map.get(plate.get("variable"), plate["variable"])
-                plate_setup = f"{plate_variable} = protocol.load_labware('{plate['name']}', '{plate['slot']}')"
-                if plate["name"] not in script:
-                    script += "\n    " + plate_setup
 
         return script
     
@@ -147,19 +184,31 @@ class GenericTransformer:
         Update command syntax dynamically based on mappings from the YAML file.
         """
         commands_map = self.map["commands"]
+        trash_config = self.map.get("deckSetup", {}).get("trash", {})
+        drop_tip_location = trash_config.get("dropTipLocation", "A1")  # Default to A1
+        trash_variable = trash_config.get("variable", "trash")
+
         for command, details in commands_map.items():
             if "from" in details and "to" in details:
                 if reverse:
                     script = re.sub(details["to"], details["from"], script)
                 else:
                     script = re.sub(details["from"], details["to"], script)
+
+            # Dynamically replace pipette.drop_tip() with pipette.drop_tip(trash['<location>'])
+            if command == "drop_tip" and not reverse:
+                drop_tip_pattern = r"pipette\.drop_tip\(\)"
+                drop_tip_replacement = f"pipette.drop_tip({trash_variable}['{drop_tip_location}'])"
+                script = re.sub(drop_tip_pattern, drop_tip_replacement, script)
+
             if not reverse and "insert_after" in details and "code" in details:
-                # Insert the comment after specific calls like protocol.load_labware
+                # Insert extra code dynamically if defined
                 script = re.sub(
                     r"(" + re.escape(details["insert_after"]) + r"\(.*?\))",
                     r"\1\n    " + details["code"],
                     script
                 )
+
         return script
 
     def transform(self, input_file, output_file, reverse=False):

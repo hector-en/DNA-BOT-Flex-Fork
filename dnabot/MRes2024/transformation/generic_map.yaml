@@ -12,7 +12,14 @@ deckSetup:
   plates:
     - {"name": "nest_96_wellplate_100ul_pcr_full_skirt", "slot": "2", "variable": "plate_96"}
   trash:
-    {"name": "opentrons_1_trash_1100ml_fixed", "slot": "A3", "variable": "trash"}
+    {"name": "opentrons_1_trash_1100ml_fixed", 
+    "slot": {
+      "flex": "A3", 
+      "ot2": "12"
+      }, 
+      "variable": "trash", 
+      "dropTipLocation": "A1"
+      }
 
 variables:
   "tiprack_20ul": "tiprack_50"
@@ -68,5 +75,5 @@ commands:
   move_labware:
     from: "protocol.move_labware"
     to: "protocol.move_labware"
-    insert_after: "protocol.load_labware"
+    insert_after: "protocol.load_instrument"
     code: "protocol.comment('Gripper required for labware transfer')"

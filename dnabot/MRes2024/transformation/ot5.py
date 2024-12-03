@@ -2,10 +2,9 @@ from opentrons import protocol_api, simulate
 
 # Metadata
 metadata = {
-    'apiLevel': '2.15',
-    'protocolName': 'Clip Reaction Simulation',
-    'description': 'Simulate a Clip Reaction on OT-2 or Flex'
-}
+    'protocolName': 'OT-2 Protocol',
+    'description': 'Simulate a Clip Reaction on OT-2 or OT-2',
+    'apiLevel': '2.20'}
 
 # Example Clips Dictionary
 clips_dict = {
@@ -27,9 +26,15 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
         simulate (bool): If True, run in simulation mode.
     """
     # Deck Setup
-    tiprack_20ul = protocol.load_labware('opentrons_96_tiprack_20ul', '1')
+    protocol.comment('Gripper required for labware transfer')
+    
+    # Flex-specific labware setup
+    tiprack_50 = protocol.load_labware('opentrons_96_tiprack_20ul', '1')
     plate_96 = protocol.load_labware('nest_96_wellplate_100ul_pcr_full_skirt', '2')
-    pipette = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tiprack_20ul])
+    
+
+    # Load a Flex-compatible pipette
+    pipette = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tiprack_50])
 
     # Define wells
     prefixes = plate_96.wells_by_name()
@@ -41,11 +46,11 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
         pipette.pick_up_tip()
         pipette.transfer(
             clips_dict["parts_vols"][i],
+            parts[clips_dict["parts_wells"][i]],
             prefixes[clips_dict["prefixes_wells"][i]],
-            suffixes[clips_dict["suffixes_wells"][i]],
             new_tip='never'
         )
-        pipette.drop_tip()
+        pipette.drop_tip()  # Explicitly drop into A1 of the trash container
 
     # Output simulation commands
     if simulate:
@@ -56,5 +61,5 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
 # Simulation Example
 if __name__ == "__main__":
     # Create a simulated protocol context
-    protocol = simulate.get_protocol_api('2.15')
+    protocol = simulate.get_protocol_api('2.20')
     run(protocol, simulate=True)
