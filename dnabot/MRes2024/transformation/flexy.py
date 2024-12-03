@@ -2,10 +2,14 @@ from opentrons import protocol_api, simulate
 
 # Metadata
 metadata = {
-    'protocolName': 'Updated Protocol',
+    'apiLevel': '2.15',
+    'protocolName': 'Simulate a Clip Reaction on OT-2 or Flex',
     'description': 'Simulate a Clip Reaction on OT-2 or Flex'
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+requirements = {
+    "robotType": "Flex",
+    "apiLevel": "2.19"
+}
 
 # Example Clips Dictionary
 clips_dict = {
@@ -27,15 +31,11 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
         simulate (bool): If True, run in simulation mode.
     """
     # Deck Setup
-    protocol.comment('Gripper required for labware transfer')
-    
-    # Flex-specific labware setup
-    tiprack_50 = protocol.load_labware('opentrons_flex_96_tiprack_50ul', '1')
-    plate_96 = protocol.load_labware('nest_96_wellplate_100ul_pcr_full_skirt', '2')
-    trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', 'A3')
-
-    # Load a Flex-compatible pipette
-    pipette = protocol.load_instrument('flex_1channel_50', 'right', tip_racks=[tiprack_50])
+    tiprack_20ul = protocol.load_labware
+protocol.comment('Gripper required for labware transfer')('opentrons_flex_96_tiprack_50ul', '1')
+    plate_96 = protocol.load_labware
+protocol.comment('Gripper required for labware transfer')('nest_96_wellplate_100ul_pcr_full_skirt', '2')
+    pipette = protocol.load_instrument('flex_1channel_50', 'right', tip_racks=[tiprack_20ul])
 
     # Define wells
     prefixes = plate_96.wells_by_name()
@@ -47,11 +47,11 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
         pipette.pick_up_tip()
         pipette.transfer(
             clips_dict["parts_vols"][i],
-            parts[clips_dict["parts_wells"][i]],
             prefixes[clips_dict["prefixes_wells"][i]],
+            suffixes[clips_dict["suffixes_wells"][i]],
             new_tip='never'
         )
-        pipette.drop_tip(trash['A1'])  # Explicitly drop into A1 of the trash container
+        pipette.drop_tip()
 
     # Output simulation commands
     if simulate:
@@ -62,5 +62,5 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
 # Simulation Example
 if __name__ == "__main__":
     # Create a simulated protocol context
-    protocol = simulate.get_protocol_api('2.20')
+    protocol = simulate.get_protocol_api('2.15')
     run(protocol, simulate=True)

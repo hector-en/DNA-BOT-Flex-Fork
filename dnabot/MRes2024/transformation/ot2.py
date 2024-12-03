@@ -1,5 +1,4 @@
-from opentrons import protocol_api
-import opentrons.simulate
+from opentrons import protocol_api, simulate
 
 # Metadata
 metadata = {
@@ -57,5 +56,5 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
 # Simulation Example
 if __name__ == "__main__":
     # Create a simulated protocol context
-    protocol = opentrons.simulate.get_protocol_api('2.15')
+    protocol = simulate.get_protocol_api('2.15')
     run(protocol, simulate=True)
