@@ -6,6 +6,19 @@ requirements:
   robotType: "Flex"
   apiLevel: "2.19"
 
+deckSetup:
+  tipracks:
+    - {"name": "opentrons_flex_96_tiprack_50ul", "slot": "1", "variable": "tiprack_50"}
+  plates:
+    - {"name": "nest_96_wellplate_100ul_pcr_full_skirt", "slot": "2", "variable": "plate_96"}
+  trash:
+    {"name": "opentrons_1_trash_1100ml_fixed", "slot": "A3", "variable": "trash"}
+
+variables:
+  "tiprack_20ul": "tiprack_50"
+  "plate_96": "plate_96"
+  "trash": "trash"
+
 labware:
   # Tip racks
   "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
@@ -17,6 +30,7 @@ labware:
   # Reservoirs
   "usascientific_12_reservoir_22ml": "nest_12_reservoir_15ml"
   "agilent_1_reservoir_290ml": "axygen_1_reservoir_90ml"
+
 
 pipettes:
   # OT-2 to Flex Pipette Mapping

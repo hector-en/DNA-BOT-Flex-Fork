@@ -31,13 +31,13 @@ def run(protocol: protocol_api.ProtocolContext, simulate=False):
         simulate (bool): If True, run in simulation mode.
     """
     # Deck Setup
-    tiprack_20ul = protocol.load_labware
-protocol.comment('Gripper required for labware transfer')('opentrons_flex_96_tiprack_50ul', '1')
-    plate_96 = protocol.load_labware
-protocol.comment('Gripper required for labware transfer')('nest_96_wellplate_100ul_pcr_full_skirt', '2')
-    trash = protocol.load_labware
-protocol.comment('Gripper required for labware transfer')('opentrons_1_trash_1100ml_fixed', 'A3')
-    pipette = protocol.load_instrument('flex_1channel_50', 'right', tip_racks=[tiprack_20ul])
+    tiprack_50 = protocol.load_labware('opentrons_flex_96_tiprack_50ul', '1')
+    protocol.comment('Gripper required for labware transfer')
+    plate_96 = protocol.load_labware('nest_96_wellplate_100ul_pcr_full_skirt', '2')
+    protocol.comment('Gripper required for labware transfer')
+    trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', 'A3')
+    protocol.comment('Gripper required for labware transfer')
+    pipette = protocol.load_instrument('flex_1channel_50', 'right', tip_racks=[tiprack_50])
 
     # Define wells
     prefixes = plate_96.wells_by_name()
