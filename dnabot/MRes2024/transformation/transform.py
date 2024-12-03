@@ -244,9 +244,9 @@ if __name__ == "__main__":
 
     transformer = GenericTransformer("generic_map.yaml")
 
-    if direction == "ot2_to_flex":
+    if direction == "-of":
         transformer.transform(input_script, output_script, reverse=False)
-    elif direction == "flex_to_ot2":
+    elif direction == "-fo":
         transformer.transform(input_script, output_script, reverse=True)
     else:
         print("Invalid direction.")
