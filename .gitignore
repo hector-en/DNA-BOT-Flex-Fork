@@ -123,6 +123,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+dnabot/MRes2024/transformation/testmap.yaml
 
 # Pyre type checker
 .pyre/
