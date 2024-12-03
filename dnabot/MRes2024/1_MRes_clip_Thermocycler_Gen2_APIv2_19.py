@@ -99,7 +99,21 @@ __LABWARES={"p20_single": {"id": "flex_1channel_50"},
             #"mix_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
             #"clip_source_plate": {"id": "4ti0960rig_96_wellplate_200ul"}
             }
-__PARAMETERS={"clip_keep_thermo_lid_closed": {"value": "No", "id": "No"}, "premix_linkers": {"value": "Yes", "id": "No"}, "premix_parts": {"value": "Yes", "id": "Yes"}, "linkers_volume": {"value": 20}, "parts_volume": {"value": 20}, "thermo_temp": {"value": 4}, "purif_magdeck_height": {"value": 10.8}, "purif_wash_time": {"value": 0.5}, "purif_bead_ratio": {"value": 1.8}, "purif_incubation_time": {"value": 5}, "purif_settling_time": {"value": 2}, "purif_drying_time": {"value": 5}, "purif_elution_time": {"value": 2}, "transfo_incubation_temp": {"value": 4}, "transfo_incubation_time": {"value": 20}}
+__PARAMETERS={"clip_keep_thermo_lid_closed": {"value": "No", "id": "No"}, 
+              "premix_linkers": {"value": "Yes", "id": "No"}, 
+              "premix_parts": {"value": "Yes", "id": "Yes"}, 
+              "linkers_volume": {"value": 20}, 
+              "parts_volume": {"value": 20}, 
+              "thermo_temp": {"value": 4}, 
+              "purif_magdeck_height": {"value": 10.8}, 
+              "purif_wash_time": {"value": 0.5}, 
+              "purif_bead_ratio": {"value": 1.8}, 
+              "purif_incubation_time": {"value": 5}, 
+              "purif_settling_time": {"value": 2}, 
+              "purif_drying_time": {"value": 5}, 
+              "purif_elution_time": {"value": 2}, 
+              "transfo_incubation_temp": {"value": 4}, 
+              "transfo_incubation_time": {"value": 20}}
 
 
 def run(protocol: protocol_api.ProtocolContext):
