@@ -76,13 +76,17 @@ clips_dict={"prefixes_wells": ["C1", "A1", "E1", "B2", "D2", "B2"],
             "parts_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_vols": [1, 1, 1, 1, 1, 1], 
             "water_vols": [7.0, 7.0, 7.0, 7.0, 7.0, 7.0]}
-__LABWARES={"p20_single": {"id": "flex_1channel_50"}, 
-            "p300_multi": {"id": "flex_8channel_50"}, 
+__LABWARES={
             #"p20_single": {"id": "p20_single_gen2"}, 
+            "p20_single": {"id": "flex_1channel_50"},
             #"p300_multi": {"id": "p300_multi_gen2"}, 
-            "mag_deck": {"id": "magneticModuleV1"}, 
-            "96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"}, 
-            "96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"}, 
+            "p300_multi": {"id": "flex_8channel_50"},  
+            #"mag_deck": {"id": "magneticModuleV1"}, 
+            "mag_deck": {"id": "magneticBlockV1"},
+            #"96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"},
+            "96_tiprack_20ul": {"id": "opentrons_flex_96_tiprack_50ul"}, 
+            #"96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"},
+            "96_tiprack_300ul": {"id": "opentrons_flex_96_tiprack_1000ul"}, 
             #"24_tuberack_1500ul": {"id": "e14151500starlab_24_tuberack_1500ul"}, 
             "24_tuberack_1500ul": {"id": "opentrons_24_tuberack_nest_1.5ml_snapcap"},
             "clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
@@ -105,7 +109,7 @@ __PARAMETERS={"clip_keep_thermo_lid_closed": {"value": "No", "id": "No"},
               "linkers_volume": {"value": 20}, 
               "parts_volume": {"value": 20}, 
               "thermo_temp": {"value": 4}, 
-              "purif_magdeck_height": {"value": 10.8}, 
+              #"purif_magdeck_height": {"value": 10.8}, 
               "purif_wash_time": {"value": 0.5}, 
               "purif_bead_ratio": {"value": 1.8}, 
               "purif_incubation_time": {"value": 5}, 
@@ -125,6 +129,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #Tiprack
     tiprack_type=__LABWARES['96_tiprack_20ul']['id']
     INITIAL_TIP = 'A1'
+    #CANDIDATE_TIPRACK_SLOTS = ['3', '6', '9']
     CANDIDATE_TIPRACK_SLOTS = ['3', '6', '9']
 
     # Pipettes - pipette instructions in a single location so redefining pipette type is simpler
@@ -136,7 +141,7 @@ def run(protocol: protocol_api.ProtocolContext):
         print('Define labware must be changed to use', PIPETTE_TYPE)
         exit()
     #thermocycler module gen2 - turn off lid and cool plate to reduce evaporation
-    tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
+    tc_mod = protocol.load_module(module_name="thermocyclerModuleV2", location = "B1")
     tc_mod.open_lid()
     tc_mod.deactivate_lid()
     tc_mod.set_block_temperature(temperature=__PARAMETERS['thermo_temp']['value']) 
@@ -152,7 +157,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # Tube Rack
     TUBE_RACK_TYPE = __LABWARES['24_tuberack_1500ul']['id']
             # modified from custom labware as API 2 doesn't support labware.create anymore, so the old add_labware script can't be used
-    TUBE_RACK_POSITION = '4'
+    #TUBE_RACK_POSITION = '4'
+    TUBE_RACK_POSITION = '1'
     MASTER_MIX_WELL = 'A1'
     WATER_WELL = 'A2'
     MASTER_MIX_VOLUME = 20
