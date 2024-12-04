@@ -98,7 +98,7 @@ __LABWARES={
             "agar_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
             "12_reservoir_21000ul": {"id": "nest_12_reservoir_15ml"}, 
             "96_deepwellplate_2ml": {"id": "nest_96_wellplate_2ml_deep"}, 
-            "12_corning_wellplate": {"id": "corning_12_wellplate_6.9ml_flat"}
+            "12_corning_wellplate": {"id": "corning_12_wellplate_6.9ml_flat"},
             #"clip_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
             #"mix_plate": {"id": "4ti0960rig_96_wellplate_200ul"},
             #"clip_source_plate": {"id": "4ti0960rig_96_wellplate_200ul"}
