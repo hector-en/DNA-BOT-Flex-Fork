@@ -1,0 +1,4 @@
+parameters:
+  pcr_cycles: 20
+  annealing_temp: 55
+  extension_temp: 72

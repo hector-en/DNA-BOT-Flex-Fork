@@ -1,0 +1,6 @@
+globals:
+  pipette_speed:
+    aspirate: 10
+    dispense: 15
+  default_tipracks: ["3", "6", "9"]
+  default_plate_type: "nest_96_wellplate_100ul_pcr_full_skirt"

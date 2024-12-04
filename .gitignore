@@ -124,6 +124,8 @@ venv.bak/
 .dmypy.json
 dmypy.json
 dnabot/MRes2024/transformation/testmap.yaml
+dnabot/MRes2024/prototyping/create-project-report.sh
+dnabot/MRes2024/prototyping/project-report/
 
 # Pyre type checker
 .pyre/
