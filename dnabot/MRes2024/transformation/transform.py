@@ -235,12 +235,12 @@ class GenericTransformer:
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: python transform.py <input_script.py> <output_script.py> <direction>")
+        print("Usage: python transform.py <direction> <input_script.py> <output_script.py>")
         sys.exit(1)
 
-    input_script = sys.argv[1]
-    output_script = sys.argv[2]
-    direction = sys.argv[3]
+    input_script = sys.argv[2]
+    output_script = sys.argv[3]
+    direction = sys.argv[1]
 
     transformer = GenericTransformer("generic_map.yaml")
     if direction == "-of":
