@@ -85,7 +85,7 @@ class ProtocolMode:
     """
 
 
-    def __init__(self, global_config, mode_config, api_version="2.13"):
+    def __init__(self, global_config, mode_config, api_version="2.15"):
         """
         Initialize with global and mode-specific configurations.
 

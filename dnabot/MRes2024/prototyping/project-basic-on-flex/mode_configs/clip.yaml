@@ -1,6 +1,6 @@
 parameters:
   thermo_temp: 4
-  linkers_volume: 20
+  linkers_volume: 25
   parts_volume: 30
   clips_dict:
     prefixes_wells: ["C1", "A1", "E1", "B2", "D2", "B2"]
