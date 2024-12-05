@@ -2,7 +2,7 @@ from opentrons import protocol_api, simulate
 
 # Metadata
 metadata = {
-    'apiLevel': '2.15',
+    'apiLevel': '2.18',
     'protocolName': 'Clip Reaction Simulation',
     'description': 'Simulate a Clip Reaction on OT-2 or Flex'
 }

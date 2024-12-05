@@ -1,0 +1,43 @@
+robot_settings:
+  flex:
+    robot_model: "Flex"
+    calibrations:
+      belt:
+        x_axis_belt_tension: 120.0
+        y_axis_belt_tension: 130.0
+      deck:
+        A1: {x: 12.5, y: 9.0, z: 4.0}
+        B1: {x: 25.0, y: 9.0, z: 4.0}
+        C1: {x: 37.5, y: 9.0, z: 4.0}
+        A3: {x: 50.0, y: 20.0, z: 0.0}  # Trash location for Flex
+    settings:
+      default_tip_rack: "opentrons_flex_96_tiprack_50ul"
+      max_pipette_speed: 300  # mm/s
+      gantry_speed: 500  # mm/s
+      gripper_required: true  # For labware movement
+  ot2:
+    robot_model: "OT-2"
+    calibrations:
+      belt: {}
+      deck:
+        A1: {x: 12.5, y: 9.0, z: 4.0}
+        B1: {x: 25.0, y: 9.0, z: 4.0}
+        C1: {x: 37.5, y: 9.0, z: 4.0}
+        12: {x: 100.0, y: 50.0, z: 0.0}  # Trash location for OT-2
+    settings:
+      default_tip_rack: "opentrons_96_tiprack_300ul"
+      max_pipette_speed: 200  # mm/s
+      gantry_speed: 400  # mm/s
+      gripper_required: false  # Not required for OT-2
+
+pressure_sensor_data:
+  - timestamp: "2024-12-01T00:00:00Z"
+    pressure: 0.0
+  - timestamp: "2024-12-01T00:01:00Z"
+    pressure: 0.1
+  - timestamp: "2024-12-01T00:02:00Z"
+    pressure: 0.0
+  - timestamp: "2024-12-01T00:03:00Z"
+    pressure: 0.2
+  - timestamp: "2024-12-01T00:04:00Z"
+    pressure: 0.0

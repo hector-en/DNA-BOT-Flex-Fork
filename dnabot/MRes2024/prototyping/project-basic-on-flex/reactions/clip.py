@@ -6,7 +6,7 @@ class ClipReaction(ReactionBase):
     Handles the clip reaction logic, including labware setup and protocol execution.
     Inherits shared functionality from BaseReaction.
     """
-
+    
     def run(self, protocol):
         """
         Execute the clip reaction using the provided protocol context.

@@ -1,27 +1,26 @@
-metadata:
-  protocolName: "Simulate a Clip Reaction on OT-2 or Flex"
-  description: "Simulate a Clip Reaction on OT-2 or Flex"
-
-requirements:
-  robotType: "Flex"
-  apiLevel: "2.19"
-
 deckSetup:
   tipracks:
     - name: "opentrons_flex_96_tiprack_50ul"
-      slot: "1"
+      slot:
+        flex: "A1"
+        ot2: "2"
       variable: "tiprack_50"
   plates:
     - name: "nest_96_wellplate_100ul_pcr_full_skirt"
-      slot: "2"
+      slot:
+        flex: "A2"
+        ot2: "1"      
       variable: "clip_plate"
   trash:
     name: "opentrons_1_trash_1100ml_fixed"
     slot:
-      flex: "A3"
+      flex: "B1"
       ot2: "12"
     variable: "trash"
-    dropTipLocation: "A1"
+    dropTipLocation:
+      flex: "A1"
+      ot2: "1"
+    setup_code: "trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', '{slot}')"
 
 variables:
   PIPETTE_TYPE: "FLEX_PIPETTE_TYPE"
@@ -38,9 +37,9 @@ variable_ids:
   "p20_single": "flex_1channel_50"
   "p300_multi": "flex_8channel_1000"
   "mag_deck": "flex_magnetic_block"
-  "96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
-  "96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
-  "clip_plate": "flex_clip_plate"
+  "tiprack_20ul": "tiprack_50"
+  "tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "plate_96": "clip_plate"
   "mix_plate": "flex_mix_plate"
   "agar_plate": "flex_agar_plate"
   "24_tuberack_1500ul": "opentrons_24_tuberack_nest_1.5ml_snapcap"
@@ -52,7 +51,6 @@ labware:
   # Tip racks
   "opentrons_96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
   "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
-  "opentrons_flex_96_tiprack_1000ul": "opentrons_96_tiprack_300ul"
   "opentrons_24_tuberack_nest_1.5ml_snapcap": "opentrons_24_tuberack_nest_1.5ml_snapcap"
 
   # Well plates
@@ -66,13 +64,9 @@ labware:
 pipettes:
   # OT-2 to Flex Pipette Mapping (Bidirectional)
   "p300_single_gen2": "flex_1channel_1000"
-  "flex_1channel_1000": "p300_single_gen2"
   "p1000_single_gen2": "flex_1channel_1000"
-  "flex_1channel_1000": "p1000_single_gen2"
   "p20_single_gen2": "flex_1channel_50"
-  "flex_1channel_50": "p20_single_gen2"
   "p300_multi_gen2": "flex_8channel_1000"
-  "flex_8channel_1000": "p300_multi_gen2"
   "p20_multi_gen2": "flex_8channel_50"
 
 
@@ -100,8 +94,8 @@ commands:
     from: "pipette.pick_up_tip"
     to: "pipette.pick_up_tip"
   drop_tip:
-    from: "pipette.drop_tip"
-    to: "pipette.drop_tip(trash['A1'])"
+    from: "pipette.drop_tip()"
+    to: "pipette.drop_tip({trash_variable}['{dropTipLocation}'])"
   move_labware:
     from: "protocol.move_labware"
     to: "protocol.move_labware"
