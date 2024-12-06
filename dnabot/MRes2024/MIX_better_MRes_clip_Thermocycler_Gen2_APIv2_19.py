@@ -261,10 +261,10 @@ def run(protocol: protocol_api.ProtocolContext):
     def mix_parts_function(Mix_parts_bool, clips_dict, pipette_name, source_plates):
         pipette = pipette_name
         
-        pipette.flow_rate.aspirate = 6
-        pipette.flow_rate.dispense = 6
-        pipette.flow_rate.blow_out = 15
-        high = 2.5
+        pipette.flow_rate.aspirate = 50
+        pipette.flow_rate.dispense = 50
+        pipette.flow_rate.blow_out = 100
+        high = 3
         normal = 1
         slow = 0.5
         vslow = 0.2
@@ -453,10 +453,12 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.aspirate(1, source_plates[prefixes_plates[clip_num]][prefixes_wells[clip_num]].bottom(1), rate=slow)
             pipette.dispense(1, destination_wells[clip_num].bottom(3), rate=slow)
             #mix after transfer
-            pipette.aspirate(2, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.dispense(2, destination_wells[clip_num].bottom(3), rate=high)
-            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=normal)
-            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.aspirate(2, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(2, destination_wells[clip_num].bottom(1), rate=high)
+            pipette.aspirate(2, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(2, destination_wells[clip_num].bottom(1), rate=high)
+            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=high)
             pipette.aspirate(4, destination_wells[clip_num].bottom(2), rate=slow)
             pipette.dispense(4, destination_wells[clip_num].bottom(3), push_out=1, rate=vslow)
             pipette.move_to(destination_wells[clip_num].top(-5))
@@ -468,10 +470,12 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.aspirate(1, source_plates[suffixes_plates[clip_num]][suffixes_wells[clip_num]].bottom(1), rate=slow)
             pipette.dispense(1, destination_wells[clip_num].bottom(3), rate=slow)
             #mix after transfer
-            pipette.aspirate(2, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.dispense(2, destination_wells[clip_num].bottom(3), rate=high)
-            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=normal)
-            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.aspirate(2, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(2, destination_wells[clip_num].bottom(1), rate=high)
+            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=high)
+            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=high)
+            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=high)
             pipette.aspirate(4, destination_wells[clip_num].bottom(2), rate=slow)
             pipette.dispense(4, destination_wells[clip_num].bottom(3), push_out=1, rate=vslow)
             pipette.move_to(destination_wells[clip_num].top(-5))
