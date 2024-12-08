@@ -3,7 +3,7 @@ import difflib
 import yaml
 from pathlib import Path
 from datetime import datetime
-#from ai_modules.ai_pipeline import AIPipeline
+from ai_modules.ai_pipeline import AIPipeline
 
 # Directory paths
 BASE_DIR = Path(".")  # Ensure paths are relative to the working directory
@@ -238,7 +238,7 @@ def process_pipeline():
             diffs_log = LOG_DIR / f"diffs_{reaction}_{original_name}_{TIMESTAMP}.log"
             yaml_file = CONFIG_DIR / f"{reaction}.yaml"
             individual_validation_log = LOG_DIR / f"validation_{reaction}_{original_name}_{TIMESTAMP}.log"
-           # results_file = BASE_DIR / "results/experimental_results.xlsx"  # New: Path to experimental results
+            results_file = BASE_DIR / "results/experimental_results.xlsx"  # New: Path to experimental results
 
             # Present user options for the expected file
             matching_expected_files = [
@@ -329,6 +329,16 @@ def process_pipeline():
                 expected_file=expected_file, 
                 append=True
             )
+            
+            # Step 5: Run AI Pipeline (New Step)
+            print("[INFO] Running AI pipeline for optimization...")
+            ai_pipeline = AIPipeline(
+                template_file=str(expected_file or expected_template),
+                diff_log=str(diffs_log),
+                results_file=str(results_file),
+                output_dir=LOG_DIR / f"ai_pipeline_{reaction}_{original_name}_{TIMESTAMP}"
+            )
+            ai_pipeline.run()
 
             # Update expected files dynamically after each step
             expected_files = update_expected_files()
