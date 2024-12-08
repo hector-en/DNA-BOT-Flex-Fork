@@ -1,0 +1,120 @@
+reaction: clip
+deckSetup:
+  thermocycler:
+    name:
+      "thermocyclerModuleV2": "thermocyclerModuleV2"
+    lid_temperature: 105
+    block_temperature: 4
+    pcr_profile:
+      steps:
+        - {temperature: 37, hold_time_minutes: 2}
+        - {temperature: 20, hold_time_minutes: 1}
+      repetitions: 20
+    post_pcr:
+      temperature: 60
+      hold_time_minutes: 10
+
+  magnetic_block:
+      name:
+        "magneticModuleV1": "magneticBlockV1"
+      slot:
+        "6": "B2"
+
+  tuberacks:
+    MASTER_MIX_WELL:
+      slot:
+        "1": "A1"
+    WATER_WELL: 
+      slot:
+        "2": "A2"
+  tipracks:
+    slot:
+      "3": "A3"
+  trash:
+    slot:
+      "12": "B1"
+    dropTipLocation:
+      "12": "B1"
+    setup_code: "trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', '{slot}')"
+
+variable_ids:
+# OT-2 to Flex Variable Mapping (Bidirectional)
+  "p20_single": "flex_1channel_50"
+  "p300_multi": "flex_1channel_1000" # old flex has multi channel, but new has one channel
+  #new flex onlz has the 8 channel peppettes with 50ul, do not have multichannel of 1000ul
+  "mag_deck": "flex_magnetic_block"
+  "tiprack_20ul": "tiprack_50"
+  "tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "plate_96": "clip_plate"
+  "mix_plate": "flex_mix_plate"
+  "agar_plate": "flex_agar_plate"
+  "12_reservoir_21000ul": "flex_12_reservoir_15ml"
+  "96_deepwellplate_2ml": "flex_deepwell_plate"
+
+labware:
+  # OT-2 to Flex Labware Mapping (Bidirectional)
+  #tube racks
+  "24_tuberack_1500ul": "opentrons_24_tuberack_nest_1.5ml_snapcap"
+  # Tip racks
+  "opentrons_96_tiprack_20ul": "opentrons_flex_96_tiprack_50ul"
+  "opentrons_96_tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
+  "opentrons_24_tuberack_nest_1.5ml_snapcap": "opentrons_24_tuberack_nest_1.5ml_snapcap"
+
+  # Well plates
+  "nest_96_wellplate_100ul_pcr_full_skirt": "nest_96_wellplate_100ul_pcr_full_skirt"
+  "corning_96_wellplate_360ul_flat": "corning_96_wellplate_360ul_flat"
+  "biorad_96_wellplate_200ul_pcr": "armadillo_96_wellplate_200ul_pcr_full_skirt"
+  # Reservoirs
+  "usascientific_12_reservoir_22ml": "nest_12_reservoir_15ml"
+  "agilent_1_reservoir_290ml": "axygen_1_reservoir_90ml"
+  #trash  
+  "opentrons_1_trash_1100ml_fixed": "opentrons_1_trash_1100ml_fixed"
+
+pipettes:
+  # OT-2 to Flex Pipette Mapping (Bidirectional)
+  "p300_single_gen2": "flex_1channel_1000"
+  "p1000_single_gen2": "flex_1channel_1000"
+  "p20_single_gen2": "flex_1channel_50"
+  "p300_multi_gen2": "flex_8channel_1000"
+  "p20_multi_gen2": "flex_8channel_50"
+
+
+modules:
+  # OT-2 to Flex Modules (Bidirectional)
+  "heaterShakerModuleV1": "heaterShakerModuleV1"
+
+
+commands:
+  # Update command syntax as needed
+  mix:
+    from: "pipette.mix"
+    to: "pipette.mix"
+  aspirate:
+    from: "pipette.aspirate"
+    to: "pipette.aspirate"
+  dispense:
+    from: "pipette.dispense"
+    to: "pipette.dispense"
+  pick_up_tip:
+    from: "pipette.pick_up_tip"
+    to: "pipette.pick_up_tip"
+  set_block_temperature:
+    from: "tc_mod.set_block_temperature(temperature=4)"
+    to: "tc_mod.set_block_temperature(temperature={block_temperature})"
+  set_lid_temperature:
+    from: "tc_mod.set_lid_temperature(37)"
+    to: "tc_mod.set_lid_temperature({lid_temperature})"
+  drop_tip:
+    from: "pipette.drop_tip()"
+    to: "pipette.drop_tip({trash_variable}['{dropTipLocation}'])"
+  move_labware:
+    from: "protocol.move_labware"
+    to: "protocol.move_labware"
+    insert_after: "protocol.load_instrument"
+    code: "protocol.comment('Gripper required for labware transfer')"
+
+customFiles:
+  - path: "/custom/clip/4ti0136_96_wellplate_2200ul.json"
+    variable: "4ti0136_96_wellplate_2200ul"
+  - path: "/custom/clip/4ti0960rig_96_wellplate_200ul.json"
+    variable: "4ti0960rig_96_wellplate_200ul"
