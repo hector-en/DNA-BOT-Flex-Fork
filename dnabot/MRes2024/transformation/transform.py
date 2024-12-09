@@ -551,7 +551,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     def print_usage_and_exit():
-        print("Usage: python transform.py --reaction <clip|purification|assembly|transformation> <direction: -of|-fo> <input_script.py> <output_script.py>")
+        print("Usage: python transform.py --reaction <clip|purification|assembly|transformation|serial_dilution> <direction: -of|-fo> <input_script.py> <output_script.py>")
         sys.exit(1)
 
     # Ensure sufficient arguments are provided
@@ -562,7 +562,7 @@ if __name__ == "__main__":
     try:
         reaction_index = sys.argv.index("--reaction")
         reaction = sys.argv[reaction_index + 1]
-        if reaction not in ["clip", "purification", "assembly", "transformation"]:
+        if reaction not in ["clip", "purification", "assembly", "transformation", "serial_dilution"]:
             raise ValueError(f"Invalid reaction type: '{reaction}'.")
 
         # Extract remaining arguments explicitly
