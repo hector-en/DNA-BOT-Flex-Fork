@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import time
+from datetime import datetime, timedelta
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 
 class BaseExperiment:
     """
@@ -22,23 +23,41 @@ class BaseExperiment:
             results_dir (str or Path): Directory containing result files.
             output_dir (str or Path): Directory to save outputs (e.g., analysis results, plots).
         """
-        self.results_dir = Path(results_dir)
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.results_dir = Path(results_dir)  # Path to the results directory
+        self.output_dir = Path(output_dir)  # Path to the output directory
+        self.output_dir.mkdir(exist_ok=True)  # Ensure the output directory exists
+        self.results = {}  # Initialize results storage
 
-    def load_results(self, file_extension=".xlsx"):
+    def load_results(self, file_extension=".csv"):
         """
-        Load result files from the directory.
-        Args:
-            file_extension (str): File extension of result files (e.g., ".xlsx").
+        Load CSV result files updated within the last minute, with a confirmation before loading.
+        Returns:
+            pd.DataFrame: The loaded data.
         """
-        self.results = {}
-        for file in self.results_dir.glob(f"*{file_extension}"):
-            try:
-                self.results[file.name] = pd.read_excel(file)
-                print(f"[INFO] Loaded results from {file.name}")
-            except Exception as e:
-                print(f"[ERROR] Could not load {file.name}: {e}")
+        print("[INFO] Monitoring for recently updated CSV files...")
+        while True:
+            now = datetime.now()
+            recent_files = [
+                file for file in self.results_dir.glob(f"*{file_extension}")
+                if not file.name.startswith("~$") and
+                (now - datetime.fromtimestamp(file.stat().st_mtime)) <= timedelta(minutes=1)
+            ]
+
+            if recent_files:
+                for file in recent_files:
+                    user_choice = input(f"Do you want to load {file.name}? (Y/N): ").strip().lower()
+                    if user_choice == 'y':
+                        try:
+                            loaded_data = pd.read_csv(file)
+                            print(f"[INFO] Successfully loaded: {file.name}")
+                            return loaded_data  # Return the loaded DataFrame
+                        except Exception as e:
+                            print(f"[ERROR] Could not load {file.name}: {e}")
+                    else:
+                        print(f"[INFO] Skipping file: {file.name}")
+            else:
+                print("[INFO] No recently updated files found. Retrying in 5 seconds...")
+                time.sleep(5)
 
     def save_results(self, df, filename):
         """
@@ -76,29 +95,60 @@ class SerialDilutionExperiment(BaseExperiment):
 
     def visualize_results(self, data, output_file_prefix="serial_dilution"):
         """
-        Generate visualization for serial dilution data in log scale.
+        Visualize serial dilution data directly from a DataFrame.
+        Args:
+            data (pd.DataFrame): DataFrame containing the serial dilution data.
+            output_file_prefix (str): Prefix for saved plot files.
         """
         try:
-            # Plot fluorescence data in log scale
+            # Display the data preview
+            print("[INFO] Data preview:")
+            print(data.head())
+
+            # Display rows and columns for user selection
+            print("\n[INFO] Available rows and indices:")
+            for idx, row_name in enumerate(data.index):
+                print(f"Index {idx}: {row_name}")
+            print("\n[INFO] Available columns:")
+            for col_name in data.columns:
+                print(f"- {col_name}")
+
+            # Prompt user for row and column range selection
+            start_row = int(input("Enter the starting row index: ").strip())
+            end_row = int(input("Enter the ending row index (inclusive): ").strip())
+            start_col = input("Enter the starting column name: ").strip()
+            end_col = input("Enter the ending column name: ").strip()
+
+            # Slice the selected data
+            selected_data = data.loc[
+                data.index[start_row:end_row + 1], start_col:end_col
+            ]
+
+            # Display the selected data
+            print("\n[INFO] Selected data:")
+            print(selected_data)
+
+            # Ask for the control column
+            control_col = input("Enter the name of the control column: ").strip()
+            if control_col not in selected_data.columns:
+                raise ValueError(f"[ERROR] Control column '{control_col}' not found in the selected data.")
+
+            # Extract control and other data
+            control_data = selected_data[control_col]
+            other_data = selected_data.drop(columns=control_col)
+
+            # Plot fluorescence data with the control column highlighted
             plt.figure(figsize=(12, 6))
-            sns.lineplot(data=np.log1p(data.iloc[:, :12].mean(axis=0)), marker="o")
-            plt.title("Fluorescence Data (Log Scale)")
+            sns.lineplot(data=other_data.T, dashes=False, palette="tab10", alpha=0.6, label="Test Wells")
+            plt.plot(control_data.index, control_data.values, marker="o", color="red", label=f"Control (Column {control_col})")
+            plt.title("Fluorescence Data (Control Highlighted)")
             plt.xlabel("Dilution Step")
-            plt.ylabel("Log Fluorescence")
-            plt.savefig(self.output_dir / f"{output_file_prefix}_log_fluorescence.png")
-            plt.close()
-
-            # Plot Z-Factor histogram
-            plt.figure(figsize=(10, 6))
-            sns.histplot(data['Z-Factor'], bins=20, kde=True, color='blue')
-            plt.axvline(x=0.5, color='red', linestyle='--', label='Lower Threshold (Z=0.5)')
-            plt.axvline(x=1.0, color='green', linestyle='--', label='Upper Threshold (Z=1.0)')
+            plt.ylabel("Fluorescence Intensity")
             plt.legend()
-            plt.title("Z-Factor Distribution")
-            plt.savefig(self.output_dir / f"{output_file_prefix}_z_factors.png")
+            plt.savefig(f"{output_file_prefix}_fluorescence_control_highlighted.png")
             plt.close()
 
-            print(f"[INFO] Log-scale visualizations saved to {self.output_dir}")
+            print(f"[INFO] Visualization saved as '{output_file_prefix}_fluorescence_control_highlighted.png'")
         except Exception as e:
             print(f"[ERROR] Failed to visualize data: {e}")
         

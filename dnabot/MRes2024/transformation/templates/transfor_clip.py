@@ -155,29 +155,35 @@ class GenericTransformer:
 
     def _handle_trash(self, script, config, robot_type):
         """
-        Handle trash setup dynamically.
+        Handle trash setup dynamically based on robot type.
         """
         slot = self.get_slot(config.get("slot"), robot_type)
-        setup_code = config.get("setup_code", "").format(slot=slot)
+        setup_code = config.get("setup_code", {}).get(robot_type, "").format(slot=slot)
+
         if setup_code and not re.search(re.escape(setup_code), script):
             script = re.sub(
                 r"(protocol\.comment\('Gripper required for labware transfer'\))",
                 rf"{setup_code}\n    \1",
                 script
             )
+        return script
 
     def _handle_tipracks(self, script, config, robot_type):
         """
-        Handle tipracks setup dynamically.
+        Handle tiprack setup dynamically.
         """
         for slot, location in config.get("slot", {}).items():
-            setup_code = f"tiprack_{slot} = protocol.load_labware('opentrons_flex_96_tiprack_50ul', '{location}')"
+            name = "opentrons_96_tiprack_20ul" if "20" in location else "opentrons_96_tiprack_300ul"
+            variable = f"tiprack_{slot}"
+            setup_code = f"{variable} = protocol.load_labware('{name}', '{location}')"
+
             if not re.search(re.escape(setup_code), script):
                 script = re.sub(
                     r"(protocol\.comment\('Gripper required for labware transfer'\))",
                     rf"{setup_code}\n    \1",
                     script
                 )
+        return script
 
     def _handle_tuberacks(self, script, config, robot_type):
         """
@@ -192,12 +198,15 @@ class GenericTransformer:
                     rf"{setup_code}\n    \1",
                     script
                 )
+                
     def _handle_thermocycler(self, script, config):
         """
         Handle thermocycler setup and configuration dynamically.
         """
         if not config:
-            return
+            return script
+
+        # Load thermocycler module
         name = next(iter(config.get("name", {}).values()), "thermocyclerModuleV2")
         setup_code = f"tc_mod = protocol.load_module('{name}')"
         if not re.search(re.escape(setup_code), script):
@@ -206,17 +215,31 @@ class GenericTransformer:
                 rf"{setup_code}\n    \1",
                 script
             )
-        # Configure thermocycler settings
-        script += f"\n    tc_mod.set_lid_temperature({config['lid_temperature']})"
-        script += f"\n    tc_mod.set_block_temperature({config['block_temperature']})"
+
+        # Add lid temperature configuration
+        lid_temperature = config.get("lid_temperature")
+        if lid_temperature:
+            script += f"\n    tc_mod.set_lid_temperature({lid_temperature})"
+
+        # Add block temperature and max volume configuration
+        block_temperature = config.get("block_temperature")
+        max_volume = config.get("max_volume", 100)  # Default to 100 if not specified
+        if block_temperature:
+            script += f"\n    tc_mod.set_block_temperature({block_temperature}, block_max_volume={max_volume})"
+
+        # Handle PCR profile execution
         if "pcr_profile" in config:
             pcr_profile = config["pcr_profile"]
             script += "\n    tc_mod.execute_profile(steps={steps}, repetitions={reps})".format(
                 steps=pcr_profile["steps"], reps=pcr_profile["repetitions"]
             )
+
+        # Handle post-PCR block temperature and hold time
         if "post_pcr" in config:
             post_pcr = config["post_pcr"]
-            script += f"\n    tc_mod.set_block_temperature({post_pcr['temperature']}, hold_time_minutes={post_pcr['hold_time_minutes']})"
+            script += f"\n    tc_mod.set_block_temperature({post_pcr['temperature']}, hold_time_minutes={post_pcr['hold_time_minutes']}, block_max_volume={max_volume})"
+
+        return script
     
     def _handle_magnetic_block(self, script, config, robot_type):
         """
@@ -456,7 +479,7 @@ class GenericTransformer:
                     script = re.sub(re.escape(from_command), resolved_command, script)
 
         return script
-
+                            
     def _handle_thermocycler_commands(self, script, thermocycler_config, commands_map, reverse):
         """
         Transform thermocycler-specific commands based on YAML mappings with standardized indentation.
@@ -551,7 +574,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     def print_usage_and_exit():
-        print("Usage: python transform.py --reaction <clip|purification|assembly|transformation|serial_dilution> <direction: -of|-fo> <input_script.py> <output_script.py>")
+        print("Usage: python transform.py --reaction <clip|purification|assembly|transformation> <direction: -of|-fo> <input_script.py> <output_script.py>")
         sys.exit(1)
 
     # Ensure sufficient arguments are provided
@@ -562,7 +585,7 @@ if __name__ == "__main__":
     try:
         reaction_index = sys.argv.index("--reaction")
         reaction = sys.argv[reaction_index + 1]
-        if reaction not in ["clip", "purification", "assembly", "transformation", "serial_dilution"]:
+        if reaction not in ["clip", "purification", "assembly", "transformation"]:
             raise ValueError(f"Invalid reaction type: '{reaction}'.")
 
         # Extract remaining arguments explicitly
@@ -600,4 +623,4 @@ if __name__ == "__main__":
             transformer.transform(input_script, output_script, reverse=True)
     except Exception as e:
         print(f"Error during transformation: {e}")
-        sys.exit(1)
+        sys.exit(1) 

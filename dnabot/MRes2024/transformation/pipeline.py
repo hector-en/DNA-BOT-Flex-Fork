@@ -338,3 +338,11 @@ def process_pipeline():
 
 if __name__ == "__main__":
     process_pipeline()
+    # Start the ai_pipeline.py script
+    try:
+        subprocess.run(["python", "ai_pipeline.py"], check=True)
+        print("ai_pipeline.py executed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while executing ai_pipeline.py: {e}")
+    except FileNotFoundError:
+        print("ai_pipeline.py not found. Please ensure the file exists in the current directory.")

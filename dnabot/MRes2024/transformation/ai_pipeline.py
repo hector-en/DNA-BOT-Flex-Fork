@@ -3,6 +3,8 @@ import yaml
 from pathlib import Path
 import pandas as pd
 import numpy as np
+from datetime import datetime
+import subprocess
 from ai_modules.ai_optimizer import SerialDilutionExperiment, BasicAssemblyExperiment
 from ai_modules.mapping_matrix import create_mapping_matrix, visualize_mapping_matrix, save_mapping_matrix
 from ai_modules.api_generator import generate_optimized_code, save_protocol, save_yaml_configuration
@@ -49,10 +51,10 @@ class AIPipeline:
             print(f"[INFO] Starting AI pipeline for {self.experiment_type}...")
 
             # Step 1: Load experimental or assembly data
-            self.experiment.load_results()
+            data = self.experiment.load_results()
 
             # Step 2: Visualize data (log-scale for Serial Dilution)
-            self.experiment.visualize_results()
+            self.experiment.visualize_results_from_csv(data)
 
             # Step 3: Extract features and calculate insights (e.g., Z-factors)
             if self.experiment_type == "serial_dilution":
@@ -157,3 +159,69 @@ class AIPipeline:
         except Exception as e:
             print(f"[ERROR] Failed to select previous YAML configuration: {e}")
             return None
+from pathlib import Path
+from datetime import datetime
+
+def process_ai_pipeline():
+    """
+    Execute the AI pipeline for protocol optimization.
+    Dynamically updates configurations and manages experiment selection.
+    """
+    # Define directories and paths
+    OUTPUT_DIR = Path("optimized_outputs")  # Directory for optimized outputs
+    DIFF_LOG = Path("logs/diff_log.txt")  # File for storing diffs
+    TEMPLATE_FILE = Path("templates/protocol_starting_template.py")  #template file - starting point for generating an optimized protocol.
+    RESULTS_DIR = Path("results")  # Directory for experimental results
+    CONFIGS_DIR = Path("configs")  # Directory for YAML configurations
+    TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")  # Timestamp for unique file names
+
+    # Available experiment types
+    EXPERIMENT_TYPES = ["serial_dilution", "basic_assembly"]
+
+    # Display experiment options
+    print("\n--- AI Pipeline Execution ---")
+    for idx, experiment in enumerate(EXPERIMENT_TYPES, start=1):
+        print(f"{idx}: {experiment}")
+    print("A: Abort the pipeline.")
+
+    # Get user selection
+    while True:
+        choice = input(f"Select an experiment type (1-{len(EXPERIMENT_TYPES)}) or 'A' to abort: ").strip().upper()
+        if choice == "A":
+            print("[INFO] Pipeline aborted by user.")
+            return
+        if choice.isdigit() and 1 <= int(choice) <= len(EXPERIMENT_TYPES):
+            experiment_type = EXPERIMENT_TYPES[int(choice) - 1]
+            break
+        print("[ERROR] Invalid selection. Please try again.")
+
+    # Ensure output directory exists
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Run the selected pipeline
+    try:
+        # Starting pipeline for selected experiment type.
+        pipeline = AIPipeline(
+            template_file=TEMPLATE_FILE,
+            diff_log=DIFF_LOG,
+            results_dir=RESULTS_DIR,
+            experiment_type=experiment_type,
+            output_dir=OUTPUT_DIR,
+            configs_dir=CONFIGS_DIR,
+        )
+        pipeline.run()
+        print("[SUCCESS] AI pipeline completed successfully.")
+    except Exception as e:
+        print(f"[ERROR] Pipeline execution failed: {e}")
+
+if __name__ == "__main__":
+    process_ai_pipeline()
+
+    # Start the translation pipeline.py script
+    try:
+        subprocess.run(["python", "ai_pipeline.py"], check=True)
+        print("ai_pipeline.py executed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while executing ai_pipeline.py: {e}")
+    except FileNotFoundError:
+        print("ai_pipeline.py not found. Please ensure the file exists in the current directory.")
