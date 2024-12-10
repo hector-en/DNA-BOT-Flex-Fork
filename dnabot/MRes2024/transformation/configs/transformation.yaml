@@ -5,6 +5,7 @@ deckSetup:
       "thermocyclerModuleV2": "thermocyclerModuleV2"
     lid_temperature: 105
     block_temperature: 4
+    max_volume: 100  # Ensure this is within the valid range
     pcr_profile:
       steps:
         - {temperature: 37, hold_time_minutes: 2}
@@ -32,11 +33,12 @@ deckSetup:
       "3": "A3"
   trash:
     slot:
-      "12": "B1"
+      "12": "A3"
     dropTipLocation:
-      "12": "B1"
-    setup_code: "trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', '{slot}')"
-
+      "12": "A3"
+    setup_code:
+      ot2: "trash = protocol.load_labware('opentrons_1_trash_1100ml_fixed', '{slot}')"
+      flex: "trash = protocol.load_trash_bin('{slot}')"
 variable_ids:
 # OT-2 to Flex Variable Mapping (Bidirectional)
   "p20_single": "flex_1channel_50"
@@ -47,7 +49,7 @@ variable_ids:
   "tiprack_300ul": "opentrons_flex_96_tiprack_1000ul"
   "plate_96": "clip_plate"
   "mix_plate": "flex_mix_plate"
-  "agar_plate": "flex_agar_plate"
+  "12_corning_wellplate": "flex_agar_plate"
   "12_reservoir_21000ul": "flex_12_reservoir_15ml"
   "96_deepwellplate_2ml": "flex_deepwell_plate"
 
@@ -86,18 +88,6 @@ modules:
 
 commands:
   # Update command syntax as needed
-  mix:
-    from: "pipette.mix"
-    to: "pipette.mix"
-  aspirate:
-    from: "pipette.aspirate"
-    to: "pipette.aspirate"
-  dispense:
-    from: "pipette.dispense"
-    to: "pipette.dispense"
-  pick_up_tip:
-    from: "pipette.pick_up_tip"
-    to: "pipette.pick_up_tip"
   set_block_temperature:
     from: "tc_mod.set_block_temperature(temperature=4)"
     to: "tc_mod.set_block_temperature(temperature={block_temperature})"
@@ -106,10 +96,7 @@ commands:
     to: "tc_mod.set_lid_temperature({lid_temperature})"
   drop_tip:
     from: "pipette.drop_tip()"
-    to: "pipette.drop_tip({trash_variable}['{dropTipLocation}'])"
-  move_labware:
-    from: "protocol.move_labware"
-    to: "protocol.move_labware"
+    to: "pipette.drop_tip({trash_variable})"
     insert_after: "protocol.load_instrument"
     code: "protocol.comment('Gripper required for labware transfer')"
 

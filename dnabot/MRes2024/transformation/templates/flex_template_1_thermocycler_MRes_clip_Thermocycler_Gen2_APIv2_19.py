@@ -3,10 +3,10 @@ from opentrons import protocol_api
 import numpy as np
 
 # Rename to 'clip_template' and paste into 'template_ot2_scripts' folder in DNA-BOT to use
-
+# Author:  Zhouheng Li
 #metadata
 metadata = {
-     'protocolName': 'DNABOT Step 1: Clip Reaction with thermocycler',
+     'protocolName': 'DNABOT Step 1: Clip Reaction with thermocycler (Flex Protocol)',
      'description': 'Implements linker ligation reactions using an opentrons Flex, including the thermocycler module gen2.'
 }
 
@@ -64,7 +64,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.19"}
 # Parameters for the clip reaction step
 # self.user_settings["parameters"]["clip_keep_thermo_lid_closed"]["value"] = to_numeric_value(self.param_clip_thermo_lid_closed.get())
 
-
+'''
 clips_dict={"prefixes_wells": ["C1", "A1", "E1", "B2", "D2", "B2"], 
             #"prefixes_plates": ["2", "2", "2", "2", "2", "2"], 
             "prefixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
@@ -72,6 +72,18 @@ clips_dict={"prefixes_wells": ["C1", "A1", "E1", "B2", "D2", "B2"],
             #"suffixes_plates": ["2", "2", "2", "2", "2", "2"], 
             "suffixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_wells": ["A3", "B3", "C3", "D3", "E3", "D3"], 
+            #"parts_plates": ["2", "2", "2", "2", "2", "2"], 
+            "parts_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
+            "parts_vols": [1, 1, 1, 1, 1, 1], 
+            "water_vols": [7.0, 7.0, 7.0, 7.0, 7.0, 7.0]}
+'''
+clips_dict={"prefixes_wells": ["A1", "B1", "C1", "D1", "E1", "F1"], 
+            #"prefixes_plates": ["2", "2", "2", "2", "2", "2"], 
+            "prefixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
+            "suffixes_wells": ["A2", "B2", "C2", "D2", "E2", "F2"], 
+            #"suffixes_plates": ["2", "2", "2", "2", "2", "2"], 
+            "suffixes_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
+            "parts_wells": ["A3", "B3", "C3", "D3", "E3", "F3"], 
             #"parts_plates": ["2", "2", "2", "2", "2", "2"], 
             "parts_plates": ["D2", "D2", "D2", "D2", "D2", "D2"], 
             "parts_vols": [1, 1, 1, 1, 1, 1], 
@@ -89,9 +101,9 @@ __LABWARES={
             "96_tiprack_300ul": {"id": "opentrons_flex_96_tiprack_1000ul"}, 
             #"24_tuberack_1500ul": {"id": "e14151500starlab_24_tuberack_1500ul"}, 
             "24_tuberack_1500ul": {"id": "opentrons_24_tuberack_nest_1.5ml_snapcap"},
-            #"clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
-            #"clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
-            #"mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            #"clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+            #"clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+            #"mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
             "final_assembly_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
             "transfo_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
             "transfo_plate_wo_thermo": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
@@ -182,7 +194,7 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.flow_rate.dispense = 50
         pipette.flow_rate.blow_out = 100
         #pipetting rates below - expressed as multiple of default 
-        high = 2.5
+        high = 2
         normal = 1
         slow = 0.5
         vslow = 0.2
@@ -190,8 +202,8 @@ def run(protocol: protocol_api.ProtocolContext):
         #linker_volume=20
         #set maximum volume for mixing calculations as 40 as P20 pipette being used
         #maximum linker mix is set as linker_vol/2
-        if __PARAMETERS['linkers_volume']['value']>40:
-            linker_vol=40
+        if __PARAMETERS['linkers_volume']['value']>100:
+            linker_vol=100
         else:
             linker_vol=__PARAMETERS['linkers_volume']['value']
 
@@ -224,30 +236,32 @@ def run(protocol: protocol_api.ProtocolContext):
             # [clip_num,1] addresses the well location
             for clip_num in range(len(prefixes_unique)):  #high = 2.5, normal = 1, slow = 0.5,  vslow = 0.
                 pipette.pick_up_tip()
-                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]], rate=normal)
+                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(2), rate=normal)
                 pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(3), rate=high)
-                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(1), rate=normal)
-                pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(2), rate=normal)
-                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(1), rate=slow)
+                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(2), rate=normal)
                 protocol.delay(seconds=1)
-                pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(linker_vol/10), rate=vslow, push_out=linker_vol/20)
-                pipette.move_to(source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].top(-5)) # move to 2mm below the top of current well
+                pipette.dispense(linker_vol/2, source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].bottom(linker_vol/10), rate=slow, push_out=linker_vol/10)
+                pipette.move_to(source_plates[prefixes_unique[clip_num, 0]][prefixes_unique[clip_num, 1]].top(-4)) # move to 2mm below the top of current well
                 pipette.blow_out()
                 pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
                 pipette.drop_tip()
 
             for clip_num in range(len(suffixes_unique)):  
                 pipette.pick_up_tip()
-                pipette.well_bottom_clearance.aspirate = 2  # tip is x mm above well bottom
-                pipette.well_bottom_clearance.dispense = 1  # tip is y mm above well bottom
                 pipette.aspirate(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(2), rate=normal)
-                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(1), rate=high)
+                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(3), rate=high)
                 pipette.aspirate(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(2), rate=normal)
-                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(1), rate=normal)
-                pipette.aspirate(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(1), rate=slow)
+                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(2), rate=slow)
                 protocol.delay(seconds=1)
-                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(linker_vol/10), rate=vslow, push_out=linker_vol/20)
-                pipette.move_to(source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].top(-5)) # move to 2mm below the top of current well
+                pipette.dispense(linker_vol/2, source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].bottom(linker_vol/10), rate=slow, push_out=linker_vol/10)
+                pipette.move_to(source_plates[suffixes_unique[clip_num, 0]][suffixes_unique[clip_num, 1]].top(-4)) # move to 2mm below the top of current well
                 pipette.blow_out()
                 pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
                 pipette.drop_tip()
@@ -257,10 +271,10 @@ def run(protocol: protocol_api.ProtocolContext):
     def mix_parts_function(Mix_parts_bool, clips_dict, pipette_name, source_plates):
         pipette = pipette_name
         
-        pipette.flow_rate.aspirate = 6
-        pipette.flow_rate.dispense = 6
-        pipette.flow_rate.blow_out = 15
-        high = 2.5
+        pipette.flow_rate.aspirate = 50
+        pipette.flow_rate.dispense = 50
+        pipette.flow_rate.blow_out = 100
+        high = 2
         normal = 1
         slow = 0.5
         vslow = 0.2
@@ -268,8 +282,8 @@ def run(protocol: protocol_api.ProtocolContext):
         #set maximum volume for mixing calculations as 40 as P20 pipette being used
         #maximum linker mix is set as part_vol/2
     
-        if __PARAMETERS['parts_volume']['value']>40:
-            part_vol=40
+        if __PARAMETERS['parts_volume']['value']>100:
+            part_vol=100
         else:
             part_vol=__PARAMETERS['parts_volume']['value']
         
@@ -288,13 +302,15 @@ def run(protocol: protocol_api.ProtocolContext):
                 pipette.pick_up_tip()
                 pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
                 pipette.well_bottom_clearance.dispense = 1  # tip is 2 mm above well bottom
-                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(1), rate=high)
-                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(1), rate=high)
-                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(1), rate=high)
-                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(1), rate=high)
-                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(1), rate=high)
+                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(2), rate=normal)
+                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(3), rate=high)
+                pipette.aspirate(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(2), rate=slow)
                 protocol.delay(seconds=1)
-                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(part_vol/10), rate=slow, push_out=part_vol/20)
+                pipette.dispense(part_vol/2, source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].bottom(part_vol/10), rate=slow, push_out=part_vol/10)
                 pipette.move_to(source_plates[parts_unique[clip_num, 0]][parts_unique[clip_num, 1]].top(-5)) # move to 5mm below the top of current well
                 pipette.blow_out()
                 pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
@@ -396,14 +412,13 @@ def run(protocol: protocol_api.ProtocolContext):
         mix_parts_function(Mix_parts_bool, clips_dict, pipette, source_plates)
 
         ### Reset pipette clearance for setting up clip reactions - pipetting small volume into larger volume
-        pipette.flow_rate.aspirate = 6
-        pipette.flow_rate.dispense = 6
-        pipette.flow_rate.blow_out = 15
-        high = 2.5
+        pipette.flow_rate.aspirate = 50
+        pipette.flow_rate.dispense = 50
+        pipette.flow_rate.blow_out = 100
+        high = 2
         normal = 1
         slow = 0.5
         vslow = 0.2
-
         
         # get the location at the center of well A1
         # center_location = plate["A1"].center()
@@ -447,13 +462,16 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.aspirate(1, source_plates[prefixes_plates[clip_num]][prefixes_wells[clip_num]].bottom(1), rate=slow)
             pipette.dispense(1, destination_wells[clip_num].bottom(3), rate=slow)
             #mix after transfer
-            pipette.aspirate(2, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.dispense(2, destination_wells[clip_num].bottom(3), rate=high)
-            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=normal)
-            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.aspirate(4, destination_wells[clip_num].bottom(2), rate=slow)
-            pipette.dispense(4, destination_wells[clip_num].bottom(3), push_out=1, rate=vslow)
-            pipette.move_to(destination_wells[clip_num].top(-5))
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=normal)
+            pipette.aspirate(5, destination_wells[clip_num].bottom(3), rate=slow)
+            protocol.delay(seconds=1)
+            pipette.dispense(5, destination_wells[clip_num].bottom(2), push_out=1, rate=slow)
+            pipette.move_to(destination_wells[clip_num].top(-4))
             pipette.blow_out()
             pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
             pipette.drop_tip()
@@ -462,13 +480,16 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.aspirate(1, source_plates[suffixes_plates[clip_num]][suffixes_wells[clip_num]].bottom(1), rate=slow)
             pipette.dispense(1, destination_wells[clip_num].bottom(3), rate=slow)
             #mix after transfer
-            pipette.aspirate(2, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.dispense(2, destination_wells[clip_num].bottom(3), rate=high)
-            pipette.aspirate(3, destination_wells[clip_num].bottom(2), rate=normal)
-            pipette.dispense(3, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.aspirate(4, destination_wells[clip_num].bottom(2), rate=slow)
-            pipette.dispense(4, destination_wells[clip_num].bottom(3), push_out=1, rate=vslow)
-            pipette.move_to(destination_wells[clip_num].top(-5))
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(4, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(4, destination_wells[clip_num].bottom(4), rate=normal)
+            pipette.aspirate(5, destination_wells[clip_num].bottom(3), rate=slow)
+            protocol.delay(seconds=1)
+            pipette.dispense(5, destination_wells[clip_num].bottom(2), push_out=1, rate=slow)
+            pipette.move_to(destination_wells[clip_num].top(-4))
             pipette.blow_out()
             pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
             pipette.drop_tip()
@@ -477,13 +498,16 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.aspirate(parts_vols[clip_num], source_plates[parts_plates[clip_num]][parts_wells[clip_num]].bottom(1), rate=slow)
             pipette.dispense(parts_vols[clip_num], destination_wells[clip_num].bottom(3), rate=slow)
             #mix after transfer
-            pipette.aspirate(5, destination_wells[clip_num].bottom(1), rate=normal)
-            pipette.dispense(5, destination_wells[clip_num].bottom(3), rate=high)
-            pipette.aspirate(10, destination_wells[clip_num].bottom(2), rate=normal)
-            pipette.dispense(10, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.aspirate(15, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(15, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(15, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(15, destination_wells[clip_num].bottom(4), rate=high)
+            pipette.aspirate(15, destination_wells[clip_num].bottom(1), rate=normal)
+            pipette.dispense(15, destination_wells[clip_num].bottom(4), rate=normal)
             pipette.aspirate(15, destination_wells[clip_num].bottom(2), rate=slow)
-            pipette.dispense(15, destination_wells[clip_num].bottom(3), push_out=1, rate=vslow)
-            pipette.move_to(destination_wells[clip_num].top(-5))
+            protocol.delay(seconds=1)
+            pipette.dispense(15, destination_wells[clip_num].bottom(3), push_out=2, rate=slow)
+            pipette.move_to(destination_wells[clip_num].top(-4))
             pipette.blow_out()
             pipette.touch_tip(radius=0.9, v_offset=-5, speed=10)
             pipette.drop_tip()
@@ -522,3 +546,13 @@ def run(protocol: protocol_api.ProtocolContext):
          #output command actions in simulate
         for line in protocol.commands(): 
             print(line)
+if __name__ == "__main__":
+    #robot_type = input("Enter robot type (Flex or OT-2): ").strip() or "Flex"
+    robot_type = "Flex"
+    from flex_simulate import FlexibleSimulate
+    # Use the custom FlexSimulate class
+    protocol = FlexibleSimulate.get_protocol_api("2.19", robot_type=robot_type)  # Ensure the correct API level is used
+
+    # Debugging: inspect protocol setup
+    print(f"Simulated robot type: {protocol.robot_type}")
+    run(protocol)  # Call the `run` function for the protocol logic

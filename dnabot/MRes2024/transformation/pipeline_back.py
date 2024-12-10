@@ -1,9 +1,14 @@
+import os
 import subprocess
 import difflib
 import yaml
+import json 
 from pathlib import Path
 from datetime import datetime
-#from ai_modules.ai_pipeline import AIPipeline
+from ai_modules.ai_pipeline import AIPipeline
+
+#from validation import validate_transformation, validate_experiment  # Add validation utilities
+
 
 # Directory paths
 BASE_DIR = Path(".")  # Ensure paths are relative to the working directory
@@ -12,9 +17,10 @@ EXPECTED_DIR = BASE_DIR / "templates"
 TRANSFORMED_DIR = BASE_DIR / "transformed_scripts"
 CONFIG_DIR = BASE_DIR / "configs"
 LOG_DIR = BASE_DIR / "logs"
+RESULTS_DIR = BASE_DIR / "results"
 
 # Predefined reaction types
-REACTIONS = ["clip", "purification", "assembly", "transformation"]
+REACTIONS = ["clip", "purification", "assembly", "transformation", "serial_dilution"]
 
 # Timestamp for unique filenames
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -113,7 +119,7 @@ def validate_yaml(diffs, yaml_file):
 
 def validate_transform(diffs, transform_file):
     """
-    Validate that transform.py handles all required transformations. 
+    Validate that transform.py handles all required transformations.
     """
     with open(transform_file, "r") as file:
         transform_code = file.read()
@@ -210,6 +216,7 @@ def process_pipeline():
     Dynamically updates available expected outputs after each step.
     """
     LOG_DIR.mkdir(exist_ok=True)  # Ensure log directory exists
+    RESULTS_DIR.mkdir(exist_ok=True)
     validation_log = LOG_DIR / f"validation_{TIMESTAMP}.log"  # Single comprehensive validation log
 
     def update_expected_files():
@@ -238,8 +245,11 @@ def process_pipeline():
             diffs_log = LOG_DIR / f"diffs_{reaction}_{original_name}_{TIMESTAMP}.log"
             yaml_file = CONFIG_DIR / f"{reaction}.yaml"
             individual_validation_log = LOG_DIR / f"validation_{reaction}_{original_name}_{TIMESTAMP}.log"
-           # results_file = BASE_DIR / "results/experimental_results.xlsx"  # New: Path to experimental results
-
+            # File paths for this file
+            results_file = RESULTS_DIR / f"results_{reaction}_{original_name}.xlsx"
+            if not results_file.exists():
+                print(f"[ERROR] Results file {results_file} not found. Skipping reaction: {reaction}")
+                continue
             # Present user options for the expected file
             matching_expected_files = [
                 f for f, r in expected_files.items() if r == reaction
@@ -329,12 +339,20 @@ def process_pipeline():
                 expected_file=expected_file, 
                 append=True
             )
-
-            # Update expected files dynamically after each step
-            expected_files = update_expected_files()
+            
+            # Step 5: Run the AI pipeline
+            print("[INFO] Running AI pipeline for optimization and YAML generation...")
+            ai_pipeline = AIPipeline(
+                template_file=expected_file,
+                diff_log=diffs_log,
+                results_dir=RESULTS_DIR,
+                experiment_type=reaction,
+                output_dir=LOG_DIR,
+                configs_dir=CONFIG_DIR
+            )
+            ai_pipeline.run()
 
         except Exception as e:
             print(f"[ERROR] Pipeline failed for {reaction} ({original_name}): {e}")
-
 if __name__ == "__main__":
     process_pipeline()

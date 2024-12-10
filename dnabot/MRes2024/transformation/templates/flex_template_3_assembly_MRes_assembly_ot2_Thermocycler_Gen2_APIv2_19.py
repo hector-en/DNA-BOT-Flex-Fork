@@ -1,14 +1,13 @@
 from opentrons import protocol_api
 import numpy as np
 # metadata
-metadata = {
-    'protocolName': 'DNABOT Step 3: Assembly with thermocycler Gen2 (Flex Protocol)',
-    'description': 'DNABOT Step 3: Assembly with thermocycler Gen2',
-    }
-requirements = {
-    'apiLevel': '2.19',
-    'robotType': 'Flex'
-}
+# Author:  Anthony Sowerbutts
+metadata = {'protocolName': 'DNABOT Step 3: Assembly with thermocycler Gen2 (Flex Protocol)',}
+
+
+# requirements
+requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+
 # Construct assemblies are set up on thermocycler module gen2 by combining purified clip parts.
 
 # Test dictionary can be used for simulation 3 or 88 assemblies
@@ -24,42 +23,62 @@ tiprack_num=1
 
 # __LABWARES is expected to be redefined by "generate_ot2_script" method
 # Test dict - generic labware for simulation
-__LABWARES={
-     "flex_1channel_50": {"id": "flex_1channel_50"}, 
-     #"flex_1channel_1000": {"id": "flex_8channel_1000"}, 
-     #"flex_magnetic_block": {"id": "magdeck"},
-     "clip_plate":{"id":"armadillo_96_wellplate_200ul_pcr_full_skirt"},
-     "final_assembly_plate":{"id":"armadillo_96_wellplate_200ul_pcr_full_skirt"},
-     "96_tiprack_20ul": {"id": "opentrons_flex_96_tiprack_50ul"}, 
-     #"96_tiprack_300ul": {"id": "opentrons_flex_96_tiprack_1000ul"}, 
+'''__LABWARES={
+     "p50_single": {"id": "flex_1channel_50"}, 
+     #"p300_multi": {"id": "p300_multi_gen2"}, 
+     #"mag_deck": {"id": "magdeck"},
+     "clip_plate":{"id":"biorad_96_wellplate_200ul_pcr"},
+     "final_assembly_plate":{"id":"biorad_96_wellplate_200ul_pcr"},
+     #"96_tiprack_20ul": {"id": "opentrons_96_tiprack_20ul"}, 
+     "flex_96_tiprack_50ul": {"id": "opentrons_flex_96_tiprack_50ul"}, 
+     #"96_tiprack_300ul": {"id": "opentrons_96_tiprack_300ul"}, 
      "24_tuberack_2000ul": {"id": "opentrons_24_tuberack_generic_2ml_screwcap"}, 
-     #"96_wellplate_200ul_pcr_step_14": {"id": "armadillo_96_wellplate_200ul_pcr_full_skirt"}, 
-     #"96_wellplate_200ul_pcr_step_23": {"id": "armadillo_96_wellplate_200ul_pcr_full_skirt"}, 
-     #"agar_plate_step_4": {"id": "armadillo_96_wellplate_200ul_pcr_full_skirt"}, 
-     #"flex_12_reservoir_15ml": {"id": "nest_12_reservoir_15ml"}, 
-     #"flex_deepwell_plate": {"id": "nest_96_wellplate_2ml_deep"}
+     #"96_wellplate_200ul_pcr_step_14": {"id": "biorad_96_wellplate_200ul_pcr"}, 
+     #"96_wellplate_200ul_pcr_step_23": {"id": "biorad_96_wellplate_200ul_pcr"}, 
+     #"agar_plate_step_4": {"id": "biorad_96_wellplate_200ul_pcr"}, 
+     #"12_reservoir_21000ul": {"id": "nest_12_reservoir_15ml"}, 
+     #"96_deepwellplate_2ml": {"id": "nest_96_wellplate_2ml_deep"}
      #corning_12_wellplate_6.9ml_flat
-     }
+     }'''
 
 final_assembly_dict={"A1": ["A7", "B7", "C7", "D7", "E7"], "B1": ["A7", "B7", "C7", "D7", "E7"], "C1": ["A7", "B7", "C7", "F7"], "D1": ["A7", "B7", "C7", "F7"]}
 tiprack_num=1
-__LABWARES={"flex_1channel_50": {"id": "flex_1channel_50"}, "flex_1channel_1000": {"id": "flex_8channel_1000"}, "flex_magnetic_block": {"id": "magneticModuleV1"}, "96_tiprack_20ul": {"id": "opentrons_flex_96_tiprack_50ul"}, "96_tiprack_300ul": {"id": "opentrons_flex_96_tiprack_1000ul"}, "opentrons_24_tuberack_nest_1.5ml_snapcap": {"id": "e14151500starlab_opentrons_24_tuberack_nest_1.5ml_snapcap"}, "clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "flex_mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "final_assembly_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "transfo_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "transfo_plate_wo_thermo": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "flex_agar_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, "flex_12_reservoir_15ml": {"id": "nest_12_reservoir_15ml"}, "flex_deepwell_plate": {"id": "nest_96_wellplate_2ml_deep"}, "12_corning_wellplate": {"id": "corning_12_wellplate_6.9ml_flat"}}
-
+__LABWARES={"p50_single": {"id": "flex_1channel_50"},
+            "p50_multi": {"id": "flex_8channel_50"}, 
+            "p1000_single": {"id": "flex_1channel_1000"}, 
+            "p1000_multi": {"id": "flex_8channel_1000"},
+            "mag_block": {"id": "magneticBlockV1"},
+            "mag_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "flex_96_tiprack_50ul": {"id": "opentrons_flex_96_tiprack_50ul"}, 
+            "flex_96_tiprack_200ul": {"id": "opentrons_flex_96_tiprack_200ul"},
+            "flex_96_tiprack_1000ul": {"id": "opentrons_flex_96_tiprack_1000ul"}, 
+            "24_tuberack_1500ul": {"id": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap"}, 
+            "clip_source_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"},
+            "clip_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "mix_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "final_assembly_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "transfo_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "transfo_plate_wo_thermo": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "agar_plate": {"id": "nest_96_wellplate_100ul_pcr_full_skirt"}, 
+            "12_reservoir_21000ul": {"id": "nest_12_reservoir_15ml"}, 
+            "96_deepwellplate_2ml": {"id": "nest_96_wellplate_2ml_deep"}, 
+            "12_corning_wellplate": {"id": "corning_12_wellplate_6.9ml_flat"}}
 
 def run(protocol: protocol_api.ProtocolContext):
-
-    def final_assembly(final_assembly_dict, tiprack_num, tiprack_type=__LABWARES['96_tiprack_20ul']['id']):
+    trash = protocol.load_trash_bin(location="A3")
+    def final_assembly(final_assembly_dict, tiprack_num, tiprack_type=__LABWARES['flex_96_tiprack_50ul']['id']):
         
             # Constants, we update all the labware name in version 2
             #Tiprack
-            CANDIDATE_TIPRACK_SLOTS = ['2', '3', '5', '6', '9']
+            #CANDIDATE_TIPRACK_SLOTS = ['2', '3', '5', '6', '9']
+            CANDIDATE_TIPRACK_SLOTS = ['D2', 'D3', 'C2', 'C3', 'B3']
             PIPETTE_MOUNT = 'right'
             #Plate of sample after  purification
             CLIP_PLATE_TYPE = __LABWARES['clip_plate']['id']
-            CLIP_PLATE_POSITION = '1'
+            CLIP_PLATE_POSITION = 'D1'
             #Tuberack
-            TUBE_RACK_TYPE = __LABWARES['24_tuberack_2000ul']['id']
-            TUBE_RACK_POSITION = '4'
+            TUBE_RACK_TYPE = __LABWARES['24_tuberack_1500ul']['id']
+            TUBE_RACK_POSITION = 'C1'
             #Destination plate
             DESTINATION_PLATE_TYPE = __LABWARES['final_assembly_plate']['id']
             TOTAL_VOL = 15
@@ -73,13 +92,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
             slots = CANDIDATE_TIPRACK_SLOTS[:tiprack_num]
             tipracks = [protocol.load_labware(tiprack_type, slot) for slot in slots]
-            pipette = protocol.load_instrument(__LABWARES['flex_1channel_50']['id'], PIPETTE_MOUNT, tip_racks=tipracks)
+            pipette = protocol.load_instrument(__LABWARES['p50_single']['id'], PIPETTE_MOUNT, tip_racks=tipracks)
 
             # Define Labware and set temperature
             purified_clip_plate = protocol.load_labware(CLIP_PLATE_TYPE, CLIP_PLATE_POSITION)
             tube_rack = protocol.load_labware(TUBE_RACK_TYPE, TUBE_RACK_POSITION)
                   
-            #thermocycler module gen2
+            #thermocycler module gen2 
             tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
             destination_plate = tc_mod.load_labware(DESTINATION_PLATE_TYPE)
             tc_mod.open_lid()
@@ -112,7 +131,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 pipette.pick_up_tip()
                 for destination_well in destination_wells:# make tube_rack_wells and destination_plate.wells in the same type  
                     pipette.distribute(TOTAL_VOL - x * PART_VOL, tube_rack[master_mix_well], destination_plate[destination_well],blow_out=True, blowout_location="source well", new_tip='never')
-                pipette.drop_tip(trash['B1'])
+                pipette.drop_tip()
 
             # Part transfers
             for key, values in list(final_assembly_dict.items()):
@@ -134,7 +153,7 @@ def run(protocol: protocol_api.ProtocolContext):
                     pipette.move_to(destination_plate[key].top(-8))
                     pipette.blow_out()
                     pipette.touch_tip(radius=0.6, v_offset=-8, speed=10)
-                    pipette.drop_tip(trash['B1'])
+                    pipette.drop_tip()
 
             #thermocycler module gen2
             tc_mod.close_lid()
@@ -142,7 +161,7 @@ def run(protocol: protocol_api.ProtocolContext):
             tc_mod.set_block_temperature(50, hold_time_minutes=45, block_max_volume=15)
             tc_mod.set_block_temperature(4, hold_time_minutes=2, block_max_volume=30)
             # Increase the hold time at 4 C if necessary
-            tc_mod.set_lid_temperature(105)
+            tc_mod.set_lid_temperature(37)
             protocol.delay(seconds=120)
             tc_mod.deactivate_lid()
             tc_mod.open_lid()
